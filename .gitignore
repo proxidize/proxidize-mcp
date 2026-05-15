@@ -4,3 +4,4 @@ dist/
 .mcp.json
 .env
 CLAUDE.local.md
+.claude/worktrees/
