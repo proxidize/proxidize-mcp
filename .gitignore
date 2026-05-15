@@ -1,0 +1,6 @@
+node_modules/
+dist/
+*.csv
+.mcp.json
+.env
+CLAUDE.local.md

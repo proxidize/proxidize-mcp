@@ -1,0 +1,41 @@
+{
+  "name": "@proxidize/mcp",
+  "version": "0.1.0",
+  "description": "Proxidize MCP server for managing mobile and residential proxies",
+  "type": "module",
+  "bin": {
+    "proxidize-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && shx chmod +x dist/index.js",
+    "prepare": "npm run build",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp",
+    "proxidize",
+    "proxy",
+    "mobile-proxy"
+  ],
+  "author": "Proxidize",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@toolprint/mcp-logger": "^0.0.7",
+    "axios": "^1.16.1",
+    "retry-axios": "^4.0.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.8.0",
+    "shx": "^0.4.0",
+    "typescript": "^6.0.3"
+  }
+}
