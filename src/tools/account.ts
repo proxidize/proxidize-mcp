@@ -2,7 +2,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { get } from "../client.js";
 import { ok, fail } from "../result.js";
-import type { Paginated, Subscription } from "../types.js";
+import { outputSchemas } from "../schemas.js";
+import type { Paginated, Subscription } from "../schemas.js";
 
 export function registerAccountTools(server: McpServer) {
   server.registerTool(
@@ -16,6 +17,7 @@ export function registerAccountTools(server: McpServer) {
           .enum(["per_proxy", "per_gb"])
           .describe("Subscription type to query"),
       },
+      outputSchema: outputSchemas.paginatedSubscriptions,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async ({ type }) => {

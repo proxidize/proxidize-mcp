@@ -2,12 +2,13 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { get, post, put } from "../client.js";
 import { ok, fail } from "../result.js";
+import { outputSchemas } from "../schemas.js";
 import type {
   PerGbUser,
   AccessPointSettings,
   LocationGroup,
   Carrier,
-} from "../types.js";
+} from "../schemas.js";
 
 type Network = "mobile" | "residential";
 
@@ -29,6 +30,7 @@ function registerForNetwork(
     {
       title: `Get ${titleLabel} Usage`,
       description: `Get data usage and balance for per-GB ${label} proxies`,
+      outputSchema: outputSchemas.perGbUser,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async () => {
@@ -51,6 +53,7 @@ function registerForNetwork(
       inputSchema: {
         carrier: z.string().optional().describe("Filter by carrier ID"),
       },
+      outputSchema: outputSchemas.locations,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async ({ carrier }) => {
@@ -76,6 +79,7 @@ function registerForNetwork(
         state: z.string().optional().describe("State code"),
         country: z.string().optional().describe("Country name"),
       },
+      outputSchema: outputSchemas.carriers,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async ({ city, state, country }) => {
@@ -101,6 +105,7 @@ function registerForNetwork(
     {
       title: `Get ${titleLabel} Settings`,
       description: `Get access point settings for per-GB ${label} proxies`,
+      outputSchema: outputSchemas.accessPointSettings,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async () => {
@@ -120,6 +125,7 @@ function registerForNetwork(
     {
       title: `List ${titleLabel} Access Points`,
       description: `List all access points (sub-users) for per-GB ${label} proxies`,
+      outputSchema: outputSchemas.perGbUsers,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async () => {
@@ -147,6 +153,7 @@ function registerForNetwork(
           .string()
           .describe("Password for the new access point"),
       },
+      outputSchema: outputSchemas.message,
       annotations: {
         readOnlyHint: false,
         destructiveHint: false,
@@ -183,6 +190,7 @@ function registerForNetwork(
           .optional()
           .describe("Protocol"),
       },
+      outputSchema: outputSchemas.ipWhitelist,
       annotations: {
         readOnlyHint: false,
         destructiveHint: false,
@@ -228,6 +236,7 @@ function registerForNetwork(
           .optional()
           .describe("Protocol"),
       },
+      outputSchema: outputSchemas.message,
       annotations: {
         readOnlyHint: false,
         destructiveHint: false,

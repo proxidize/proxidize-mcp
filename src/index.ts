@@ -7,7 +7,7 @@ import { logger } from "./logger.js";
 import { registerAccountTools } from "./tools/account.js";
 import { registerPerProxyTools } from "./tools/per-proxy.js";
 import { registerPerGbTools } from "./tools/per-gb.js";
-import type { Paginated, Subscription, PerGbUser } from "./types.js";
+import type { Paginated, Subscription, PerGbUser } from "./schemas.js";
 
 async function resolvePerProxyUsername(): Promise<string | null> {
   try {

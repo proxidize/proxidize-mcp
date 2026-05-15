@@ -2,13 +2,14 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { get, post } from "../client.js";
 import { ok, fail } from "../result.js";
+import { outputSchemas } from "../schemas.js";
 import type {
   Paginated,
   Proxy,
   LocationGroup,
   Carrier,
   Tag,
-} from "../types.js";
+} from "../schemas.js";
 
 export function registerPerProxyTools(server: McpServer, username: string) {
   server.registerTool(
@@ -26,6 +27,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
           .optional()
           .describe("Results per page"),
       },
+      outputSchema: outputSchemas.paginatedProxies,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async ({ page, page_size }) => {
@@ -53,6 +55,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
             "Session ID (from list_proxies or proxy string after '-s-')"
           ),
       },
+      outputSchema: outputSchemas.proxy,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async ({ session_id }) => {
@@ -86,6 +89,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
           .optional()
           .describe("Lock rotation to a carrier ID (e.g. '6614')"),
       },
+      outputSchema: outputSchemas.message,
       annotations: {
         readOnlyHint: false,
         destructiveHint: false,
@@ -122,6 +126,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
           .string()
           .describe("Rotation token from the proxy's public_key field"),
       },
+      outputSchema: outputSchemas.message,
       annotations: {
         readOnlyHint: false,
         destructiveHint: false,
@@ -157,6 +162,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
             "Interval in seconds (min 60, max 604800). Use -1 to disable."
           ),
       },
+      outputSchema: outputSchemas.message,
       annotations: {
         readOnlyHint: false,
         destructiveHint: false,
@@ -192,6 +198,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
           .string()
           .describe("New password (letters and numbers only)"),
       },
+      outputSchema: outputSchemas.message,
       annotations: {
         readOnlyHint: false,
         destructiveHint: true,
@@ -227,6 +234,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
             "Filter locations by carrier ID (e.g. '6614' for T-Mobile)"
           ),
       },
+      outputSchema: outputSchemas.locations,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async ({ carrier }) => {
@@ -259,6 +267,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
           .optional()
           .describe("Country (e.g. 'UnitedStates')"),
       },
+      outputSchema: outputSchemas.carriers,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async ({ city, state, country }) => {
@@ -285,6 +294,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
       inputSchema: {
         ips: z.array(z.string()).describe("IP addresses to whitelist"),
       },
+      outputSchema: outputSchemas.ipWhitelist,
       annotations: {
         readOnlyHint: false,
         destructiveHint: false,
@@ -310,6 +320,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
     {
       title: "List Tags",
       description: "List all tags for organizing proxies",
+      outputSchema: outputSchemas.tags,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async () => {
@@ -328,6 +339,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
       title: "Create Tag",
       description: "Create a new tag for organizing proxy sessions",
       inputSchema: { name: z.string().describe("Tag name") },
+      outputSchema: outputSchemas.createTag,
       annotations: {
         readOnlyHint: false,
         destructiveHint: false,
@@ -353,6 +365,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
       inputSchema: {
         tag_id: z.number().int().describe("ID of the tag to delete"),
       },
+      outputSchema: outputSchemas.deleteTag,
       annotations: {
         readOnlyHint: false,
         destructiveHint: true,
@@ -379,6 +392,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
         tag_id: z.number().int().describe("Tag ID"),
         session_id: z.string().describe("Proxy session ID to tag"),
       },
+      outputSchema: outputSchemas.tagSession,
       annotations: {
         readOnlyHint: false,
         destructiveHint: false,
@@ -408,6 +422,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
         tag_id: z.number().int().describe("Tag ID"),
         session_id: z.string().describe("Proxy session ID to untag"),
       },
+      outputSchema: outputSchemas.tagSession,
       annotations: {
         readOnlyHint: false,
         destructiveHint: false,
