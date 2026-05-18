@@ -121,8 +121,35 @@ Add to `.mcp.json` or your IDE's MCP config:
 | `delete_tag` | Delete a tag (unassigns from all proxies) |
 | `tag_proxy` | Assign a tag to a proxy session |
 | `untag_proxy` | Remove a tag from a proxy session |
+### Scraping
+
+Routes requests through your Proxidize proxy. Only registered with an active Per Proxy subscription.
+
+| Tool | Description |
+|------|-------------|
 | `scrape_url` | Scrape a webpage through the proxy and return Markdown |
 | `scrape_html` | Scrape a webpage through the proxy and return raw HTML |
+
+### Browser Automation
+
+Headless Chromium browser routed through your Proxidize proxy via Playwright. Use `browser_snapshot` to discover interactive elements, then interact by ref. Only registered with an active Per Proxy subscription.
+
+| Tool | Description |
+|------|-------------|
+| `browser_navigate` | Navigate the browser to a URL |
+| `browser_snapshot` | Capture all interactive elements with refs for clicking/typing |
+| `browser_click` | Click an element by its ref |
+| `browser_type` | Type text into an element by its ref, optionally submit |
+| `browser_fill_form` | Fill multiple form fields at once by their refs |
+| `browser_screenshot` | Take a screenshot of the current page |
+| `browser_get_text` | Get the text content of the current page |
+| `browser_get_html` | Get the HTML content of the current page body |
+| `browser_go_back` | Navigate to the previous page in browser history |
+| `browser_go_forward` | Navigate to the next page in browser history |
+| `browser_scroll` | Scroll the page to the bottom |
+| `browser_scroll_to_ref` | Scroll to a specific element by its ref |
+| `browser_wait_for` | Wait for an element to become visible by its ref |
+| `browser_network_requests` | List network requests since navigating to the current page |
 
 ### Per GB Mobile Proxies
 
@@ -166,7 +193,7 @@ Same as mobile, prefixed with `residential_`. Only registered with an active res
 |----------|----------|---------|-------------|
 | `PROXIDIZE_API_TOKEN` | Yes | — | Your Proxidize API token |
 | `PROXIDIZE_BASE_URL` | No | `https://api.proxidize.com/api/v1` | API base URL |
-| `PROXIDIZE_PROXY_HOST` | No | `pg.proxi.es` | Proxy gateway hostname (used by scraping tools) |
+| `PROXIDIZE_PROXY_HOST` | No | `pg.proxi.es` | Proxy gateway hostname (used by scraping and browser tools) |
 | `PROXIDIZE_TIMEOUT` | No | `30000` | Request timeout in milliseconds |
 | `PROXIDIZE_MAX_RETRIES` | No | `2` | Max retries on server errors (0-5) |
 
@@ -174,7 +201,7 @@ Same as mobile, prefixed with `residential_`. Only registered with an active res
 
 On startup the server hits the subscription API to see what you have. Tools are registered per plan:
 
-- **Per Proxy** → 16 proxy management + scraping tools
+- **Per Proxy** → 29 proxy management, scraping, and browser tools
 - **Per GB Mobile** → 9 mobile tools
 - **Per GB Residential** → 9 residential tools
 - **Always loaded** → `get_subscription`
