@@ -278,7 +278,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
         if (country) params.country = country;
 
         const data = await get<Carrier[]>("/perproxy/carriers-proxy", params);
-        return ok(data);
+        return ok({ carriers: data });
       } catch (err) {
         return fail(err);
       }
@@ -326,7 +326,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
     async () => {
       try {
         const data = await get<Tag[]>("/perproxy/get-tags-user");
-        return ok(data);
+        return ok({ tags: data });
       } catch (err) {
         return fail(err);
       }

@@ -52,7 +52,7 @@ export const LocationGroupSchema = z.looseObject({
   country: z.looseObject({
     name: z.string(),
     value: z.string(),
-    locations: z.array(LocationSchema),
+    locations: z.array(LocationSchema).nullable(),
   }),
 });
 export type LocationGroup = z.infer<typeof LocationGroupSchema>;
@@ -108,12 +108,12 @@ export type PerGbUser = z.infer<typeof PerGbUserSchema>;
  */
 export const AccessPointSettingsSchema = z.looseObject({
   access_point: z.string(),
-  carrier: z.string(),
-  city: z.string(),
-  city_name: z.string(),
-  country: z.string(),
-  hostname: z.enum(["dns", "ip"]),
-  ip_mode: z.string(),
+  carrier: z.string().nullable(),
+  city: z.string().nullable(),
+  city_name: z.string().nullable(),
+  country: z.string().nullable(),
+  hostname: z.enum(["dns", "ip"]).nullable(),
+  ip_mode: z.string().nullable(),
   proxy_type: z.enum(["socks", "http"]),
 });
 export type AccessPointSettings = z.infer<typeof AccessPointSettingsSchema>;
@@ -183,14 +183,14 @@ export const outputSchemas = {
   paginatedProxies: paginated(ProxySchema),
   proxy: ProxySchema,
   locations: z.looseObject({ locations: z.array(LocationGroupSchema) }),
-  carriers: z.array(CarrierSchema),
-  tags: z.array(TagSchema),
+  carriers: z.looseObject({ carriers: z.array(CarrierSchema) }),
+  tags: z.looseObject({ tags: z.array(TagSchema) }),
   createTag: CreateTagResponseSchema,
   deleteTag: DeleteTagResponseSchema,
   tagSession: TagSessionResponseSchema,
   message: MessageResponseSchema,
   ipWhitelist: IpWhitelistResponseSchema,
   perGbUser: PerGbUserSchema,
-  perGbUsers: z.array(PerGbUserSchema),
-  accessPointSettings: z.array(AccessPointSettingsSchema),
+  perGbUsers: z.looseObject({ access_points: z.array(PerGbUserSchema) }),
+  accessPointSettings: z.looseObject({ settings: z.array(AccessPointSettingsSchema) }),
 } as const;

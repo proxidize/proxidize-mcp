@@ -93,7 +93,7 @@ function registerForNetwork(
           `${prefix(network)}/carriers-proxy`,
           params
         );
-        return ok(data);
+        return ok({ carriers: data });
       } catch (err) {
         return fail(err);
       }
@@ -113,7 +113,7 @@ function registerForNetwork(
         const data = await get<AccessPointSettings[]>(
           `${prefix(network)}/settings`
         );
-        return ok(data);
+        return ok({ settings: data });
       } catch (err) {
         return fail(err);
       }
@@ -133,7 +133,7 @@ function registerForNetwork(
         const data = await get<PerGbUser[]>(
           `${prefix(network)}/access-point`
         );
-        return ok(data);
+        return ok({ access_points: data });
       } catch (err) {
         return fail(err);
       }
