@@ -3,6 +3,7 @@ import { z } from "zod";
 import axios from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import TurndownService from "turndown";
+import { gfm } from "@joplin/turndown-plugin-gfm";
 import { JSDOM } from "jsdom";
 import { get } from "../client.js";
 import { ok, fail } from "../result.js";
@@ -18,12 +19,72 @@ interface ProxyInfo {
   http_port: string;
 }
 
+const NOISE_SELECTORS = [
+  "script", "style", "noscript", "svg",
+  "nav", "footer", "header", "aside",
+  '[role="banner"]', '[role="navigation"]', '[role="contentinfo"]',
+  '[hidden]', '[aria-hidden="true"]',
+].join(", ");
+
 const turndown = new TurndownService({
   headingStyle: "atx",
   codeBlockStyle: "fenced",
+  bulletListMarker: "-",
 });
 
-turndown.remove(["script", "style", "nav", "footer", "header", "aside"]);
+turndown.use(gfm);
+
+turndown.addRule("anchor", {
+  filter: "a",
+  replacement(content, node) {
+    if (!content.trim()) return "";
+
+    const prefix = content[0] === " " ? " " : "";
+    const suffix = content[content.length - 1] === " " ? " " : "";
+    const text = content.trim().replace(/\n\n.*/g, "");
+    if (!text) return "";
+
+    const href = (node as HTMLAnchorElement).getAttribute("href") ?? "";
+    const title = (node as HTMLAnchorElement).title ?? "";
+
+    if (href) {
+      try {
+        const parsed = new URL(href);
+        if (!["https:", "http:"].includes(parsed.protocol)) {
+          return `${prefix}${text}${suffix}`;
+        }
+      } catch {
+        if (!/^https?:/.test(href)) {
+          return `${prefix}${text}${suffix}`;
+        }
+      }
+    }
+
+    if (text.replace(/\\_/g, "_") === href && !title) {
+      return `<${href}>`;
+    }
+
+    const titlePart = title ? ` "${title}"` : "";
+    return `${prefix}[${text}](${href}${titlePart})${suffix}`;
+  },
+});
+
+turndown.addRule("img", {
+  filter: "img",
+  replacement(_, node) {
+    const el = node as HTMLImageElement;
+    const alt = el.getAttribute("alt") ?? "";
+    let src = el.getAttribute("src") ?? "";
+    const title = el.getAttribute("title") ?? "";
+
+    if (src.startsWith("data:")) {
+      src = src.split(",")[0] + "...";
+    }
+
+    const titlePart = title ? ` "${title}"` : "";
+    return `![${alt}](${src}${titlePart})`;
+  },
+});
 
 async function resolveProxy(
   perProxyUser: string,
@@ -85,15 +146,17 @@ function htmlToMarkdown(html: string): string {
   const dom = new JSDOM(html);
   const doc = dom.window.document;
 
-  const main =
+  doc.querySelectorAll(NOISE_SELECTORS).forEach((el) => el.remove());
+
+  const root =
     doc.querySelector("main") ||
     doc.querySelector("article") ||
     doc.querySelector('[role="main"]') ||
     doc.body;
 
-  if (!main) return turndown.turndown(html);
+  if (!root) return turndown.turndown(html);
 
-  return turndown.turndown(main.innerHTML);
+  return turndown.turndown(root.innerHTML);
 }
 
 export function registerScrapingTools(
