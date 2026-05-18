@@ -21,7 +21,7 @@ function registerForNetwork(
   network: Network,
   superUser: string | null
 ) {
-  const tag = network === "mobile" ? "mobile" : "resi";
+  const tag = network === "mobile" ? "mobile" : "residential";
   const label = network === "mobile" ? "mobile" : "residential";
   const titleLabel = network === "mobile" ? "Mobile" : "Residential";
 

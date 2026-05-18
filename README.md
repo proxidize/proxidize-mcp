@@ -139,18 +139,18 @@ Prefixed with `mobile_`. Only registered if you have an active Per GB mobile sub
 
 ### Per GB Residential Proxies
 
-Same as mobile, prefixed with `resi_`. Only registered with an active residential subscription.
+Same as mobile, prefixed with `residential_`. Only registered with an active residential subscription.
 
 | Tool | Description |
 |------|-------------|
-| `resi_get_usage` | Residential data balance |
-| `resi_list_locations` | Available residential locations |
-| `resi_list_carriers` | Available residential carriers |
-| `resi_get_settings` | Access point settings |
-| `resi_list_access_points` | List residential sub-users |
-| `resi_create_access_point` | Create a residential sub-user |
-| `resi_create_ip_whitelist` | Whitelist IPs for residential proxies |
-| `resi_update_ip_whitelist` | Update a residential whitelist entry |
+| `residential_get_usage` | Residential data balance |
+| `residential_list_locations` | Available residential locations |
+| `residential_list_carriers` | Available residential carriers |
+| `residential_get_settings` | Access point settings |
+| `residential_list_access_points` | List residential sub-users |
+| `residential_create_access_point` | Create a residential sub-user |
+| `residential_create_ip_whitelist` | Whitelist IPs for residential proxies |
+| `residential_update_ip_whitelist` | Update a residential whitelist entry |
 
 ---
 
