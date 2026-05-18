@@ -193,4 +193,9 @@ export const outputSchemas = {
   perGbUser: PerGbUserSchema,
   perGbUsers: z.looseObject({ access_points: z.array(PerGbUserSchema) }),
   accessPointSettings: z.looseObject({ settings: z.array(AccessPointSettingsSchema) }),
+  scrapeResult: z.looseObject({
+    url: z.string(),
+    status: z.number().int(),
+    content: z.string(),
+  }),
 } as const;

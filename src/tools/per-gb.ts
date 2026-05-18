@@ -141,6 +141,62 @@ function registerForNetwork(
   );
 
   server.registerTool(
+    `${tag}_update_settings`,
+    {
+      title: `Update ${titleLabel} Settings`,
+      description: `Update access point routing settings for per-GB ${label} proxies (city, carrier, protocol, hostname type)`,
+      inputSchema: {
+        access_point: z
+          .string()
+          .describe("Access point username or IP to update"),
+        carrier: z.string().optional().describe("Carrier ID"),
+        city: z.string().optional().describe("City name"),
+        country: z.string().optional().describe("Country name"),
+        state: z.string().optional().describe("State code"),
+        hostname: z
+          .enum(["dns", "ip"])
+          .optional()
+          .describe("Hostname type"),
+        proxy_type: z
+          .enum(["socks", "http"])
+          .optional()
+          .describe("Protocol"),
+      },
+      outputSchema: outputSchemas.message,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+    },
+    async ({
+      access_point,
+      carrier,
+      city,
+      country,
+      state,
+      hostname,
+      proxy_type,
+    }) => {
+      try {
+        const body: Record<string, unknown> = { access_point };
+        if (carrier) body.carrier = carrier;
+        if (city) body.city = city;
+        if (country) body.country = country;
+        if (state) body.state = state;
+        if (hostname) body.hostname = hostname;
+        if (proxy_type) body.proxy_type = proxy_type;
+
+        const data = await post(`${prefix(network)}/settings`, body);
+        return ok(data);
+      } catch (err) {
+        return fail(err);
+      }
+    }
+  );
+
+  server.registerTool(
     `${tag}_create_access_point`,
     {
       title: `Create ${titleLabel} Access Point`,
