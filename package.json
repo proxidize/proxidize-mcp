@@ -33,6 +33,7 @@
     "axios": "^1.16.1",
     "https-proxy-agent": "^9.0.0",
     "jsdom": "^29.1.1",
+    "playwright": "^1.60.0",
     "retry-axios": "^4.0.3",
     "turndown": "^7.2.4",
     "zod": "^4.4.3"

@@ -8,6 +8,7 @@ import { registerAccountTools } from "./tools/account.js";
 import { registerPerProxyTools } from "./tools/per-proxy.js";
 import { registerPerGbTools } from "./tools/per-gb.js";
 import { registerScrapingTools } from "./tools/scraping.js";
+import { registerBrowserTools } from "./tools/browser.js";
 import type { Paginated, Subscription, PerGbUser } from "./schemas.js";
 
 async function resolvePerProxyUsername(): Promise<string | null> {
@@ -74,8 +75,10 @@ async function main() {
   if (perProxyUser) {
     registerPerProxyTools(server, perProxyUser);
     registerScrapingTools(server, perProxyUser);
+    registerBrowserTools(server, perProxyUser);
     logger.info("registered per-proxy tools (15)");
     logger.info("registered scraping tools (2)");
+    logger.info("registered browser tools (13)");
   }
 
   registerPerGbTools(server, perGbUser, resiUser);

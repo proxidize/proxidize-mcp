@@ -121,6 +121,8 @@ Add to `.mcp.json` or your IDE's MCP config:
 | `delete_tag` | Delete a tag (unassigns from all proxies) |
 | `tag_proxy` | Assign a tag to a proxy session |
 | `untag_proxy` | Remove a tag from a proxy session |
+| `scrape_url` | Scrape a webpage through the proxy and return Markdown |
+| `scrape_html` | Scrape a webpage through the proxy and return raw HTML |
 
 ### Per GB Mobile Proxies
 
@@ -136,6 +138,7 @@ Prefixed with `mobile_`. Only registered if you have an active Per GB mobile sub
 | `mobile_create_access_point` | Create a new sub-user |
 | `mobile_create_ip_whitelist` | Whitelist IPs with location/carrier/protocol options |
 | `mobile_update_ip_whitelist` | Update an existing whitelist entry |
+| `mobile_update_settings` | Update access point routing (city, carrier, protocol) |
 
 ### Per GB Residential Proxies
 
@@ -151,6 +154,7 @@ Same as mobile, prefixed with `residential_`. Only registered with an active res
 | `residential_create_access_point` | Create a residential sub-user |
 | `residential_create_ip_whitelist` | Whitelist IPs for residential proxies |
 | `residential_update_ip_whitelist` | Update a residential whitelist entry |
+| `residential_update_settings` | Update access point routing (city, carrier, protocol) |
 
 ---
 
@@ -162,6 +166,7 @@ Same as mobile, prefixed with `residential_`. Only registered with an active res
 |----------|----------|---------|-------------|
 | `PROXIDIZE_API_TOKEN` | Yes | — | Your Proxidize API token |
 | `PROXIDIZE_BASE_URL` | No | `https://api.proxidize.com/api/v1` | API base URL |
+| `PROXIDIZE_PROXY_HOST` | No | `pg.proxi.es` | Proxy gateway hostname (used by scraping tools) |
 | `PROXIDIZE_TIMEOUT` | No | `30000` | Request timeout in milliseconds |
 | `PROXIDIZE_MAX_RETRIES` | No | `2` | Max retries on server errors (0-5) |
 
@@ -169,9 +174,9 @@ Same as mobile, prefixed with `residential_`. Only registered with an active res
 
 On startup the server hits the subscription API to see what you have. Tools are registered per plan:
 
-- **Per Proxy** → 15 proxy management tools
-- **Per GB Mobile** → 8 mobile tools
-- **Per GB Residential** → 8 residential tools
+- **Per Proxy** → 16 proxy management + scraping tools
+- **Per GB Mobile** → 9 mobile tools
+- **Per GB Residential** → 9 residential tools
 - **Always loaded** → `get_subscription`
 
 No subscription, no tools. Nothing is exposed that your account can't use.
