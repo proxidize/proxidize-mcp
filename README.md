@@ -158,8 +158,8 @@ Prefixed with `mobile_`. Only registered if you have an active Per GB mobile sub
 | Tool | Description |
 |------|-------------|
 | `mobile_get_usage` | Data balance — bytes used and available |
-| `mobile_list_locations` | Available cities with speeds |
-| `mobile_list_carriers` | Available carriers by location |
+| `mobile_list_locations` | Available cities with speeds, filterable by carrier, country, or state |
+| `mobile_list_carriers` | Available carriers, filterable by country |
 | `mobile_get_settings` | Access point proxy settings |
 | `mobile_list_access_points` | List sub-users sharing your data pool |
 | `mobile_create_access_point` | Create a new sub-user |
@@ -174,8 +174,8 @@ Same as mobile, prefixed with `residential_`. Only registered with an active res
 | Tool | Description |
 |------|-------------|
 | `residential_get_usage` | Residential data balance |
-| `residential_list_locations` | Available residential locations |
-| `residential_list_carriers` | Available residential carriers |
+| `residential_list_locations` | Available residential locations, filterable by carrier, country, or state |
+| `residential_list_carriers` | Available residential carriers, filterable by country |
 | `residential_get_settings` | Access point settings |
 | `residential_list_access_points` | List residential sub-users |
 | `residential_create_access_point` | Create a residential sub-user |

@@ -52,17 +52,47 @@ function registerForNetwork(
       description: `List available ${label} proxy locations with average speeds`,
       inputSchema: {
         carrier: z.string().optional().describe("Filter by carrier ID"),
+        country: z.string().optional().describe("Filter by country name (e.g. 'United States')"),
+        state: z.string().optional().describe("Filter by state (e.g. 'Texas' or 'TX')"),
       },
       outputSchema: outputSchemas.locations,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
-    async ({ carrier }) => {
+    async ({ carrier, country, state }) => {
       try {
         const data = await get<{ locations: LocationGroup[] }>(
           `${prefix(network)}/locations-proxy`,
           carrier ? { carrier } : undefined
         );
-        return ok(data);
+
+        let locations = data.locations;
+
+        if (country) {
+          const norm = (s: string) => s.toLowerCase().replace(/[\s-]+/g, "");
+          const target = norm(country);
+          locations = locations.filter(
+            (g) =>
+              norm(g.country.name) === target ||
+              norm(g.country.value.replace("-co-", "")) === target
+          );
+        }
+
+        if (state) {
+          const target = state.toLowerCase();
+          locations = locations
+            .map((g) => ({
+              country: {
+                ...g.country,
+                locations:
+                  g.country.locations?.filter(
+                    (l) => l.state.toLowerCase() === target
+                  ) ?? null,
+              },
+            }))
+            .filter((g) => g.country.locations && g.country.locations.length > 0);
+        }
+
+        return ok({ locations });
       } catch (err) {
         return fail(err);
       }
@@ -89,11 +119,18 @@ function registerForNetwork(
         if (state) params.state = state;
         if (country) params.country = country;
 
-        const data = await get<Carrier[]>(
+        let carriers = await get<Carrier[]>(
           `${prefix(network)}/carriers-proxy`,
           params
         );
-        return ok({ carriers: data });
+
+        if (country) {
+          const norm = (s: string) => s.toLowerCase().replace(/[\s-]+/g, "");
+          const target = norm(country);
+          carriers = carriers.filter((c) => norm(c.country) === target);
+        }
+
+        return ok({ carriers });
       } catch (err) {
         return fail(err);
       }

@@ -114,7 +114,7 @@ export const AccessPointSettingsSchema = z.looseObject({
   country: z.string().nullable(),
   hostname: z.enum(["dns", "ip"]).nullable(),
   ip_mode: z.string().nullable(),
-  proxy_type: z.enum(["socks", "http"]),
+  proxy_type: z.enum(["socks", "http"]).nullable(),
 });
 export type AccessPointSettings = z.infer<typeof AccessPointSettingsSchema>;
 
