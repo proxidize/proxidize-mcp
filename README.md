@@ -102,6 +102,7 @@ Add to `.mcp.json` or your IDE's MCP config:
 | Tool | Description |
 |------|-------------|
 | `get_subscription` | Get active subscriptions, plan type, status, dates, and proxy username |
+| `get_outbound_ip` | Get the public IP of the machine running this MCP server (for IP whitelisting) |
 
 ### Per Proxy (Dedicated Mobile Proxies)
 
@@ -132,7 +133,7 @@ Routes requests through your Proxidize proxy. Only registered with an active Per
 
 ### Browser Automation
 
-Headless Chromium browser routed through your Proxidize proxy via Playwright. Use `browser_snapshot` to discover interactive elements, then interact by ref. Only registered with an active Per Proxy subscription.
+Headless Chromium browser routed through your Proxidize proxy via SOCKS5. Uses stealth patches to bypass bot detection on Google, Cloudflare, and other anti-bot systems. Use `browser_snapshot` to discover interactive elements, then interact by ref. Only registered with an active Per Proxy subscription.
 
 | Tool | Description |
 |------|-------------|
@@ -150,6 +151,7 @@ Headless Chromium browser routed through your Proxidize proxy via Playwright. Us
 | `browser_scroll_to_ref` | Scroll to a specific element by its ref |
 | `browser_wait_for` | Wait for an element to become visible by its ref |
 | `browser_network_requests` | List network requests since navigating to the current page |
+| `browser_close` | Close the browser and clear all cookies/state for a fresh session |
 
 ### Per GB Mobile Proxies
 
@@ -201,10 +203,10 @@ Same as mobile, prefixed with `residential_`. Only registered with an active res
 
 On startup the server hits the subscription API to see what you have. Tools are registered per plan:
 
-- **Per Proxy** → 29 proxy management, scraping, and browser tools
+- **Per Proxy** → 31 proxy management, scraping, and browser tools
 - **Per GB Mobile** → 9 mobile tools
 - **Per GB Residential** → 9 residential tools
-- **Always loaded** → `get_subscription`
+- **Always loaded** → `get_subscription`, `get_outbound_ip`
 
 No subscription, no tools. Nothing is exposed that your account can't use.
 
