@@ -10,6 +10,7 @@ import type { Paginated } from "../schemas.js";
 interface ProxyInfo {
   proxy: string;
   http_port: string;
+  socks_port: string;
 }
 
 interface DomElement {
@@ -24,24 +25,22 @@ class BrowserSession {
   private page: Page | null = null;
   private requests = new Map<string, { method: string; url: string; status?: number; statusText?: string }>();
   private proxyServer: string;
-  private proxyUser: string;
-  private proxyPass: string;
 
-  constructor(proxyServer: string, proxyUser: string, proxyPass: string) {
+  constructor(proxyServer: string) {
     this.proxyServer = proxyServer;
-    this.proxyUser = proxyUser;
-    this.proxyPass = proxyPass;
   }
 
   async getPage(): Promise<Page> {
     if (!this.browser) {
       this.browser = await chromium.launch({
         headless: true,
-        proxy: {
-          server: this.proxyServer,
-          username: this.proxyUser,
-          password: this.proxyPass,
-        },
+        channel: "chromium",
+        args: [
+          "--disable-blink-features=AutomationControlled",
+          "--no-first-run",
+          "--no-default-browser-check",
+        ],
+        proxy: { server: this.proxyServer },
       });
       this.browser.on("disconnected", () => {
         this.browser = null;
@@ -50,8 +49,76 @@ class BrowserSession {
     }
 
     if (!this.page) {
+      const probe = await this.browser.newContext();
+      const probePage = await probe.newPage();
+      const rawUA = await probePage.evaluate(() => navigator.userAgent);
+      await probe.close();
+
+      const userAgent = rawUA.replace("HeadlessChrome", "Chrome");
+      const major = userAgent.match(/Chrome\/(\d+)/)?.[1] ?? "148";
+      const full = userAgent.match(/Chrome\/([\d.]+)/)?.[1] ?? "148.0.0.0";
+
       const context =
-        this.browser.contexts()[0] ?? (await this.browser.newContext());
+        this.browser.contexts()[0] ??
+        (await this.browser.newContext({
+          userAgent,
+          viewport: { width: 1920, height: 1080 },
+          screen: { width: 1920, height: 1080 },
+          locale: "en-US",
+          timezoneId: "America/New_York",
+        }));
+
+      await context.addInitScript(
+        ({ major, full }: { major: string; full: string }) => {
+          if (!(window as any).chrome) {
+            (window as any).chrome = { runtime: {}, loadTimes: () => ({}), csi: () => ({}) };
+          } else if (!(window as any).chrome.runtime) {
+            (window as any).chrome.runtime = {};
+          }
+
+          const brands = [
+            { brand: "Google Chrome", version: major },
+            { brand: "Chromium", version: major },
+            { brand: "Not_A Brand", version: "24" },
+          ];
+          const fullBrands = [
+            { brand: "Google Chrome", version: full },
+            { brand: "Chromium", version: full },
+            { brand: "Not_A Brand", version: "24.0.0.0" },
+          ];
+          Object.defineProperty(navigator, "userAgentData", {
+            get: () => ({
+              brands,
+              mobile: false,
+              platform: navigator.platform?.includes("Mac") ? "macOS" : "Windows",
+              getHighEntropyValues: () =>
+                Promise.resolve({
+                  brands: fullBrands,
+                  mobile: false,
+                  platform: navigator.platform?.includes("Mac") ? "macOS" : "Windows",
+                  platformVersion: "15.0.0",
+                  architecture: navigator.platform?.includes("Mac") ? "arm" : "x86",
+                  bitness: "64",
+                  model: "",
+                  uaFullVersion: full,
+                  fullVersionList: fullBrands,
+                }),
+            }),
+          });
+
+          const origQuery = window.navigator.permissions.query.bind(
+            window.navigator.permissions
+          );
+          Object.defineProperty(window.navigator.permissions, "query", {
+            value: (params: any) =>
+              params.name === "notifications"
+                ? Promise.resolve({ state: Notification.permission } as PermissionStatus)
+                : origQuery(params),
+          });
+        },
+        { major, full }
+      );
+
       this.page = context.pages()[0] ?? (await context.newPage());
       this.page.on("request", (req) => {
         this.requests.set(req.url() + req.method(), {
@@ -201,10 +268,9 @@ async function requireSession(
   if (!res.data.length) throw new Error("No proxies available");
 
   const proxy = res.data[0];
-  const [user, pass] = proxy.proxy.split(":");
-  const server = `http://${config.proxyHost}:${proxy.http_port}`;
+  const server = `socks5://${config.proxyHost}:${proxy.socks_port}`;
 
-  session = new BrowserSession(server, user, pass);
+  session = new BrowserSession(server);
   return session;
 }
 
@@ -566,6 +632,27 @@ export function registerBrowserTools(
           }
         }
         return ok({ message: "Form filled:\n" + results.join("\n") });
+      } catch (err) {
+        return fail(err);
+      }
+    }
+  );
+
+  server.registerTool(
+    "browser_close",
+    {
+      title: "Browser Close",
+      description:
+        "Close the browser and clear all cookies/state. The next browser tool call will start a fresh session. Use this after rotating a proxy IP or when a site blocks the current session.",
+      annotations: { readOnlyHint: false, destructiveHint: true },
+    },
+    async () => {
+      try {
+        if (session) {
+          await session.close();
+          session = null;
+        }
+        return ok({ message: "Browser closed. Next navigation will start a fresh session." });
       } catch (err) {
         return fail(err);
       }
