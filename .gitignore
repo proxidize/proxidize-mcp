@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.csv
+.mcp.json
+.env
+CLAUDE.md
+CLAUDE.local.md
+.claude/worktrees/
+.local/
+.DS_Store
