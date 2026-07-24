@@ -67,6 +67,7 @@ test("discovers tools via legacy wire filters with canonical responses", async (
       PROXIDIZE_API_TOKEN: "test-token",
       PROXIDIZE_BASE_URL: `http://127.0.0.1:${address.port}`,
       PROXIDIZE_MAX_RETRIES: "0",
+      PROXIDIZE_DISABLE_ANALYTICS: "1",
     },
   });
   const client = new Client({

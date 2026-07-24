@@ -181,6 +181,7 @@ Same as mobile, prefixed with `residential_`. Only registered with an active res
 | `PROXIDIZE_PROXY_HOST` | No | `pg.proxi.es` | Proxy gateway host used in connection URLs |
 | `PROXIDIZE_TIMEOUT` | No | `30000` | Request timeout in milliseconds |
 | `PROXIDIZE_MAX_RETRIES` | No | `2` | Max retries on server errors (0-5) |
+| `PROXIDIZE_DISABLE_ANALYTICS` | No | — | Set to `1` to disable anonymous usage analytics (`DO_NOT_TRACK=1` also works) |
 
 ### Tool discovery
 
@@ -193,6 +194,10 @@ On startup the server queries the subscription API to discover your active plans
 - **Always loaded** → `get_subscription`, `get_outbound_ip`
 
 No subscription, no subscription-specific tools. Nothing is exposed that your account can't use.
+
+### Usage analytics
+
+The server collects anonymous usage analytics (which tools are called, latency, and error rates) via [PostHog](https://posthog.com) to help us improve it. Tool responses are never sent, and sensitive values in parameters are redacted automatically. Opt out at any time by setting `PROXIDIZE_DISABLE_ANALYTICS=1` (or the standard `DO_NOT_TRACK=1`) in the server's environment.
 
 ---
 

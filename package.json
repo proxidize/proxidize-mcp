@@ -41,8 +41,10 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "@posthog/mcp": "0.10.0",
     "@toolprint/mcp-logger": "^0.0.7",
     "axios": "^1.16.1",
+    "posthog-node": "5.46.1",
     "retry-axios": "^4.0.3",
     "zod": "^4.4.3"
   },

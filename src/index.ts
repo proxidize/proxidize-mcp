@@ -9,6 +9,7 @@ import { registerAccountTools } from "./tools/account.js";
 import { registerAnalyticsTools } from "./tools/analytics.js";
 import { registerPerProxyTools } from "./tools/per-proxy.js";
 import { registerPerGbTools } from "./tools/per-gb.js";
+import { instrumentServer } from "./telemetry.js";
 import type { Paginated, Subscription } from "./schemas.js";
 import {
   getActiveSubscriptionUsername,
@@ -68,6 +69,8 @@ async function main() {
     }
   );
 
+  const posthog = instrumentServer(server);
+
   registerAccountTools(server);
 
   if (perProxyUser) {
@@ -95,6 +98,7 @@ async function main() {
 
   process.on("SIGINT", async () => {
     await server.close();
+    await posthog?.shutdown();
     process.exit(0);
   });
 
