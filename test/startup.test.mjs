@@ -18,8 +18,6 @@ function subscription(typeName, username, extra = {}) {
   };
 }
 
-// Mirrors the deployed backend: only the legacy filter values are
-// recognized; anything else silently returns the default (Free) plan.
 const subscriptionsByLegacyType = {
   per_proxy: [subscription("per_proxy_mobile", "per-proxy-user", { modem_count: 1 })],
   per_gb: [

@@ -11,10 +11,6 @@ import {
   toLegacyWireType,
 } from "../subscriptions.js";
 
-/**
- * Fetch every active plan: query each distinct legacy wire filter once,
- * then keep the canonical plans, deduplicated by subscription id.
- */
 async function getAllSubscriptions(): Promise<Paginated<Subscription>> {
   const wireTypes = [...new Set(canonicalSubscriptionTypes.map(toLegacyWireType))];
   const responses = await Promise.all(

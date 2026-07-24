@@ -1,18 +1,12 @@
 import { z } from "zod";
 import { CanonicalSubscriptionTypeSchema } from "./subscriptions.js";
 
-/**
- * Proxy tag
- */
 export const TagSchema = z.looseObject({
   id: z.number().int(),
   tag: z.string(),
 });
 export type Tag = z.infer<typeof TagSchema>;
 
-/**
- * Per-proxy dedicated mobile proxy as returned by the API
- */
 export const ApiProxySchema = z.looseObject({
   session_id: z.string(),
   proxy: z.string(),
@@ -33,18 +27,12 @@ export const ApiProxySchema = z.looseObject({
 });
 export type ApiProxy = z.infer<typeof ApiProxySchema>;
 
-/**
- * Proxy enriched with ready-to-use gateway connection URLs
- */
 export const ProxySchema = ApiProxySchema.extend({
   http_url: z.string(),
   socks_url: z.string(),
 });
 export type Proxy = z.infer<typeof ProxySchema>;
 
-/**
- * Available proxy location
- */
 export const LocationSchema = z.looseObject({
   label: z.string(),
   value: z.string(),
@@ -55,9 +43,6 @@ export const LocationSchema = z.looseObject({
 });
 export type Location = z.infer<typeof LocationSchema>;
 
-/**
- * Locations grouped by country
- */
 export const LocationGroupSchema = z.looseObject({
   country: z.looseObject({
     name: z.string(),
@@ -67,9 +52,6 @@ export const LocationGroupSchema = z.looseObject({
 });
 export type LocationGroup = z.infer<typeof LocationGroupSchema>;
 
-/**
- * Mobile carrier
- */
 export const CarrierSchema = z.looseObject({
   name: z.string(),
   country: z.string(),
@@ -78,9 +60,6 @@ export const CarrierSchema = z.looseObject({
 });
 export type Carrier = z.infer<typeof CarrierSchema>;
 
-/**
- * Country-level location summary (used when no country filter is provided)
- */
 export const LocationSummaryGroupSchema = z.looseObject({
   country: z.looseObject({
     name: z.string(),
@@ -90,17 +69,11 @@ export const LocationSummaryGroupSchema = z.looseObject({
   }),
 });
 
-/**
- * Country-level carrier summary (used when no country filter is provided)
- */
 export const CarrierSummarySchema = z.looseObject({
   country: z.string(),
   carrier_count: z.number().int(),
 });
 
-/**
- * Proxidize subscription
- */
 export const SubscriptionSchema = z.looseObject({
   id: z.string(),
   status: z.string(),
@@ -112,9 +85,6 @@ export const SubscriptionSchema = z.looseObject({
 });
 export type Subscription = z.infer<typeof SubscriptionSchema>;
 
-/**
- * Per-GB proxy user or access point
- */
 export const PerGbUserSchema = z.looseObject({
   id: z.number().int(),
   created_at: z.string(),
@@ -133,9 +103,6 @@ export const PerGbUserSchema = z.looseObject({
 });
 export type PerGbUser = z.infer<typeof PerGbUserSchema>;
 
-/**
- * Per-GB access point routing settings
- */
 export const AccessPointSettingsSchema = z.looseObject({
   access_point: z.string(),
   carrier: z.string().nullable(),
@@ -148,67 +115,43 @@ export const AccessPointSettingsSchema = z.looseObject({
 });
 export type AccessPointSettings = z.infer<typeof AccessPointSettingsSchema>;
 
-/**
- * Generic success message
- */
 export const MessageResponseSchema = z.looseObject({
   message: z.string(),
 });
 
-/**
- * Rotation result with observed before/after IPs
- */
 export const RotateResultSchema = z.looseObject({
   message: z.string(),
   old_ip: z.string().nullable(),
   new_ip: z.string().nullable(),
 });
 
-/**
- * IP whitelist creation result
- */
 export const IpWhitelistResponseSchema = z.looseObject({
   message: z.string(),
   count: z.number().int(),
 });
 
-/**
- * Tag creation result
- */
 export const CreateTagResponseSchema = z.looseObject({
   id: z.number().int(),
   tag: z.string(),
   username: z.string(),
 });
 
-/**
- * Tag deletion result
- */
 export const DeleteTagResponseSchema = z.looseObject({
   tag_id: z.number().int(),
   username: z.string(),
 });
 
-/**
- * Tag-proxy assignment or removal result
- */
 export const TagSessionResponseSchema = z.looseObject({
   tag_id: z.number().int(),
   username: z.string(),
   session: z.string(),
 });
 
-/**
- * Analytics time window (ISO 8601)
- */
 const AnalyticsWindowSchema = z.looseObject({
   from: z.string(),
   to: z.string(),
 });
 
-/**
- * Traffic analytics: usage and request timeseries per plan
- */
 export const TrafficAnalyticsSchema = z.looseObject({
   window: AnalyticsWindowSchema,
   bucket_seconds: z.number().int(),
@@ -237,9 +180,6 @@ export const TrafficAnalyticsSchema = z.looseObject({
   ),
 });
 
-/**
- * Top domains by data volume and request count per plan
- */
 export const TopDomainsSchema = z.looseObject({
   window: AnalyticsWindowSchema,
   plans: z.array(
@@ -255,9 +195,6 @@ export const TopDomainsSchema = z.looseObject({
   ),
 });
 
-/**
- * Per-request connection log
- */
 export const ConnectionHistorySchema = z.looseObject({
   window: AnalyticsWindowSchema,
   total: z.number().int(),
@@ -265,9 +202,6 @@ export const ConnectionHistorySchema = z.looseObject({
   entries: z.array(z.looseObject({ timestamp: z.string() })),
 });
 
-/**
- * Paginated API response wrapper
- */
 export type Paginated<T> = {
   perPage: number;
   page: number;

@@ -13,11 +13,6 @@ import type {
   Tag,
 } from "../schemas.js";
 
-/**
- * Add ready-to-use connection URLs. The `proxy` field is
- * `username-s-session:password`; HTTP ports accept these credentials
- * directly, SOCKS ports require source-IP whitelisting instead.
- */
 function withConnectionUrls(proxy: ApiProxy): Proxy {
   return Object.assign({}, proxy, {
     http_url: `http://${proxy.proxy}@${config.proxyHost}:${proxy.http_port}`,
@@ -122,8 +117,6 @@ export function registerPerProxyTools(server: McpServer, username: string) {
         filter,
       });
 
-      // The new IP is usually visible immediately, but give a slow
-      // rotation a few seconds before reporting it unchanged.
       let newIp = await fetchIp();
       for (let attempt = 0; attempt < 3 && newIp === oldIp; attempt++) {
         await new Promise((resolve) => setTimeout(resolve, 1500));

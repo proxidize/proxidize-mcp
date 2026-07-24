@@ -4,11 +4,22 @@
   "description": "Proxidize MCP server for managing mobile and residential proxies",
   "type": "module",
   "bin": {
-    "proxidize-mcp": "./dist/index.js"
+    "proxidize-mcp": "dist/index.js"
   },
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/proxidize/proxidize-mcp.git"
+  },
+  "homepage": "https://github.com/proxidize/proxidize-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/proxidize/proxidize-mcp/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "clean": "shx rm -rf dist",
     "build": "npm run clean && tsc && shx chmod +x dist/index.js",

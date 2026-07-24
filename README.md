@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://proxidize.com/wp-content/uploads/2026/02/logo-1.svg" alt="Proxidize" height="60" />
+  <img src="https://imagedelivery.net/r4caA8hJ3Ww3j8uyC_NNCA/95a9137a-43fd-48d4-7243-983f3f4a3d00/public" alt="Proxidize" height="60" />
 
   <h1>Proxidize MCP Server</h1>
 
@@ -37,17 +37,19 @@ On startup it checks which Proxidize subscriptions are active on your account an
 
 ## Quick Start
 
+Requires [Node.js](https://nodejs.org) 18 or later.
+
 ### Claude Code
 
 ```bash
 # Local (default) — current project, private
-claude mcp add proxidize -e PROXIDIZE_API_TOKEN=YOUR_API_TOKEN -- node /path/to/proxidize-mcp/dist/index.js
+claude mcp add proxidize -e PROXIDIZE_API_TOKEN=YOUR_API_TOKEN -- npx -y @proxidize/mcp
 
 # User — all your projects, private
-claude mcp add proxidize --scope user -e PROXIDIZE_API_TOKEN=YOUR_API_TOKEN -- node /path/to/proxidize-mcp/dist/index.js
+claude mcp add proxidize --scope user -e PROXIDIZE_API_TOKEN=YOUR_API_TOKEN -- npx -y @proxidize/mcp
 
 # Project — shared with team via .mcp.json (use ${VAR} expansion to keep tokens out of version control)
-claude mcp add --scope project proxidize -- node /path/to/proxidize-mcp/dist/index.js
+claude mcp add --scope project proxidize -- npx -y @proxidize/mcp
 ```
 
 Run `/mcp` inside Claude Code to verify the connection.
@@ -60,8 +62,8 @@ Add to `claude_desktop_config.json`:
 {
   "mcpServers": {
     "proxidize": {
-      "command": "node",
-      "args": ["/path/to/proxidize-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@proxidize/mcp"],
       "env": {
         "PROXIDIZE_API_TOKEN": "YOUR_API_TOKEN"
       }
@@ -78,8 +80,8 @@ Add to `.mcp.json` or your IDE's MCP config:
 {
   "mcpServers": {
     "proxidize": {
-      "command": "node",
-      "args": ["/path/to/proxidize-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@proxidize/mcp"],
       "env": {
         "PROXIDIZE_API_TOKEN": "YOUR_API_TOKEN"
       }
@@ -201,7 +203,7 @@ Works with any MCP-compatible client:
 - [Claude Code](https://code.claude.com) (CLI, Desktop, Web)
 - [Claude Desktop](https://claude.ai/download)
 - [Cursor](https://cursor.sh)
-- [Windsurf](https://codeium.com/windsurf)
+- [Windsurf](https://windsurf.com)
 - [VS Code](https://code.visualstudio.com) (with MCP extension)
 
 ---
@@ -212,9 +214,9 @@ Works with any MCP-compatible client:
 
 Set the environment variable in your MCP server config. See [Quick Start](#quick-start).
 
-### Server connects but shows 0 tools
+### Server connects but only shows `get_subscription` and `get_outbound_ip`
 
-Your API token may be invalid or expired. Regenerate it from the Proxidize dashboard under Settings.
+Subscription discovery failed or found no active plans. Check that your API token is valid (regenerate it from the Proxidize dashboard under Settings) and that your account has an active subscription.
 
 ### Tools return "HTTP 401: Invalid token"
 
@@ -223,6 +225,23 @@ Double-check the token hasn't been regenerated since you configured the server.
 ### Timeout errors
 
 Increase the timeout: set `PROXIDIZE_TIMEOUT` to `60000` in your env config.
+
+---
+
+## Development
+
+To run from source instead of npm:
+
+```bash
+git clone https://github.com/proxidize/proxidize-mcp.git
+cd proxidize-mcp
+npm install
+npm run build
+```
+
+Then point your MCP client at the build output — e.g. `claude mcp add proxidize -e PROXIDIZE_API_TOKEN=YOUR_API_TOKEN -- node /path/to/proxidize-mcp/dist/index.js`.
+
+Run the test suite with `npm test` (no credentials needed — it boots the server against a mock API).
 
 ---
 

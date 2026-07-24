@@ -9,10 +9,6 @@ import {
   type CanonicalSubscriptionType,
 } from "../subscriptions.js";
 
-/**
- * Active plan usernames discovered at startup. A null value means the
- * account has no active subscription of that type.
- */
 export type ActivePlanUsers = Record<CanonicalSubscriptionType, string | null>;
 
 type AnalyticsFilters = {
@@ -49,10 +45,6 @@ async function graphql<T>(
   return res.data;
 }
 
-/**
- * Per-proxy analytics are keyed by username AND session keys; both are
- * required by the analytics API when plan is "pp".
- */
 async function perProxyFilter(
   username: string
 ): Promise<Pick<AnalyticsFilters, "plan" | "type" | "usernames" | "session_keys">> {
@@ -75,10 +67,6 @@ async function perProxyFilter(
   };
 }
 
-/**
- * Per-GB analytics are keyed by the master username plus every access
- * point username sharing the data pool.
- */
 async function perGbFilter(
   network: "mobile" | "residential",
   fallbackUsername: string
@@ -306,7 +294,6 @@ export function registerAnalyticsTools(server: McpServer, users: ActivePlanUsers
     },
     async ({ hours, from, to, plan }) => {
       const { fromTs, toTs } = resolveWindow(hours, from, to);
-      // API accepts only 3600/86400/604800/2592000; points are summed per domain, so any valid bucket works
       const bucketSeconds = toTs - fromTs <= 48 * 3600 ? 3600 : 86400;
 
       const plans = await Promise.all(

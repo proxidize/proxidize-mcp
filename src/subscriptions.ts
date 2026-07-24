@@ -14,14 +14,6 @@ export type CanonicalSubscriptionType = z.infer<
   typeof CanonicalSubscriptionTypeSchema
 >;
 
-/**
- * The deployed backend only recognizes the legacy `type` filter values
- * (`per_proxy`, `per_gb`) and silently returns the account's default plan
- * for anything else, even though responses already use canonical names.
- * Send the legacy value on the wire and select the canonical plan
- * client-side via filterSubscriptionResponse.
- * TODO: pass the canonical type through once the backend accepts it.
- */
 export function toLegacyWireType(type: CanonicalSubscriptionType): string {
   return type === "per_proxy_mobile" ? "per_proxy" : "per_gb";
 }
@@ -35,11 +27,6 @@ type SubscriptionResponse = {
   }>;
 };
 
-/**
- * Keep only subscriptions of the requested canonical type. Guards against
- * the backend's silent default-plan fallback and against the shared legacy
- * `per_gb` filter returning the sibling per-GB plan.
- */
 export function filterSubscriptionResponse<T extends SubscriptionResponse>(
   response: T,
   requestedType: CanonicalSubscriptionType
