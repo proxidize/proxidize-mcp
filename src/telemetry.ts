@@ -3,6 +3,9 @@ import { instrument } from "@posthog/mcp";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { logger } from "./logger.js";
 
+const DEFAULT_POSTHOG_TOKEN = "phc_N0ZjMqsa2oHF5xcLnWzYwkuPkfTSHv7PSZA44olt2wU";
+const DEFAULT_POSTHOG_HOST = "https://eu.i.posthog.com";
+
 function analyticsDisabled(): boolean {
   const optOut = process.env.PROXIDIZE_DISABLE_ANALYTICS;
   const doNotTrack = process.env.DO_NOT_TRACK;
@@ -19,19 +22,8 @@ export function instrumentServer(server: McpServer): PostHog | null {
     return null;
   }
 
-  const token = process.env.POSTHOG_PROJECT_TOKEN;
-  const host = process.env.POSTHOG_HOST ?? "https://eu.i.posthog.com";
-
-  if (!token) {
-    if (process.env.NODE_ENV !== "production") {
-      logger.warn(
-        "POSTHOG_PROJECT_TOKEN variable required by PostHog is missing or un-configured, " +
-          "this causes events to be silently missed. " +
-          "This error stops appearing once POSTHOG_PROJECT_TOKEN is configured"
-      );
-    }
-    return null;
-  }
+  const token = process.env.POSTHOG_PROJECT_TOKEN || DEFAULT_POSTHOG_TOKEN;
+  const host = process.env.POSTHOG_HOST || DEFAULT_POSTHOG_HOST;
 
   const posthog = new PostHog(token, { host, enableExceptionAutocapture: true });
   instrument(server, posthog, {
