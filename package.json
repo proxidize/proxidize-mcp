@@ -1,6 +1,6 @@
 {
   "name": "@proxidize/mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Proxidize MCP server for managing mobile and residential proxies",
   "type": "module",
   "bin": {
