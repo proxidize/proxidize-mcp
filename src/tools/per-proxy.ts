@@ -230,9 +230,7 @@ export function registerPerProxyTools(server: McpServer, username: string) {
         carrier: z
           .string()
           .optional()
-          .describe(
-            "Filter locations by carrier ID (e.g. '6614' for T-Mobile)"
-          ),
+          .describe("Filter locations by carrier ID (e.g. '6614')"),
       },
       outputSchema: outputSchemas.locations,
       annotations: { readOnlyHint: true, openWorldHint: true },

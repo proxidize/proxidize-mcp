@@ -41,14 +41,23 @@ Requires [Node.js](https://nodejs.org) 18 or later.
 
 ### Claude Code
 
+Pick one scope and run its command.
+
+**Local** (default) — this project only, private to you:
+
 ```bash
-# Local (default) — current project, private
 claude mcp add proxidize -e PROXIDIZE_API_TOKEN=YOUR_API_TOKEN -- npx -y @proxidize/mcp
+```
 
-# User — all your projects, private
+**User** — all your projects, private to you:
+
+```bash
 claude mcp add proxidize --scope user -e PROXIDIZE_API_TOKEN=YOUR_API_TOKEN -- npx -y @proxidize/mcp
+```
 
-# Project — shared with team via .mcp.json (use ${VAR} expansion to keep tokens out of version control)
+**Project** — shared with your team via `.mcp.json`. Set `PROXIDIZE_API_TOKEN` in your environment and reference it with `${VAR}` expansion so the token stays out of version control:
+
+```bash
 claude mcp add --scope project proxidize -- npx -y @proxidize/mcp
 ```
 
@@ -118,7 +127,7 @@ Add to `.mcp.json` or your IDE's MCP config:
 | `set_rotation_interval` | Set auto-rotation (60s to 7 days) or disable with -1 |
 | `update_proxy_password` | Change the password for all proxies |
 | `list_proxy_locations` | List available U.S. cities with average speeds |
-| `list_proxy_carriers` | List carriers (T-Mobile, AT&T, Verizon), filterable by location |
+| `list_proxy_carriers` | List available mobile carriers, filterable by location |
 | `create_ip_whitelist` | Whitelist source IPs for proxy access |
 | `list_tags` | List all proxy tags |
 | `create_tag` | Create a new tag |
