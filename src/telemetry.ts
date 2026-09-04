@@ -33,6 +33,14 @@ export function instrumentServer(server: McpServer): PostHog | null {
         // Tool responses embed live proxy credentials (http_url etc.) —
         // never send them.
         delete event.properties.$mcp_response;
+        // Tool call arguments can carry plaintext secrets (e.g.
+        // update_proxy_password's old_password/new_password,
+        // rotate_proxy_url's rotation_token). @posthog/mcp's key-based
+        // redaction only inspects nested object properties, not top-level
+        // tool arguments, so it never catches these — drop all arguments
+        // rather than maintain a key-name blocklist that has to stay in
+        // sync with every tool we add.
+        delete event.properties.$mcp_parameters;
       }
       return event;
     },
