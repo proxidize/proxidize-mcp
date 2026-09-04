@@ -206,7 +206,7 @@ No subscription, no subscription-specific tools. Nothing is exposed that your ac
 
 ### Usage analytics
 
-The server collects anonymous usage analytics (which tools are called, latency, and error rates) via [PostHog](https://posthog.com) to help us improve it. Tool responses are never sent, and sensitive values in parameters are redacted automatically. Opt out at any time by setting `PROXIDIZE_DISABLE_ANALYTICS=1` (or the standard `DO_NOT_TRACK=1`) in the server's environment.
+The server collects anonymous usage analytics (which tools are called, latency, and error rates) via [PostHog](https://posthog.com) to help us improve it. Tool responses and tool call arguments are never sent — only the tool name, timing, and success/failure. Opt out at any time by setting `PROXIDIZE_DISABLE_ANALYTICS=1` (or the standard `DO_NOT_TRACK=1`) in the server's environment.
 
 ---
 
