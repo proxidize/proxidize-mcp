@@ -186,7 +186,7 @@ Same as mobile, prefixed with `residential_`. Only registered with an active res
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `PROXIDIZE_API_TOKEN` | Yes | — | Your Proxidize API token |
-| `PROXIDIZE_BASE_URL` | No | `https://api.proxidize.com/api/v1` | API base URL |
+| `PROXIDIZE_BASE_URL` | No | `https://api.proxidize.com/api/v1` | API base URL. Must be an HTTPS `*.proxidize.com` URL, or a loopback address (`localhost`/`127.0.0.1`) for local testing — anything else is rejected at startup so your API token can never be sent to another host |
 | `PROXIDIZE_PROXY_HOST` | No | `pg.proxi.es` | Proxy gateway host used in connection URLs |
 | `PROXIDIZE_TIMEOUT` | No | `30000` | Request timeout in milliseconds |
 | `PROXIDIZE_MAX_RETRIES` | No | `2` | Max retries on server errors (0-5) |

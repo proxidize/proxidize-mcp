@@ -5,10 +5,38 @@ if (!token) {
   );
 }
 
+const DEFAULT_BASE_URL = "https://api.proxidize.com/api/v1";
+const LOOPBACK_HOSTNAMES = new Set(["localhost", "127.0.0.1", "::1"]);
+
+function resolveBaseUrl(): string {
+  const override = process.env.PROXIDIZE_BASE_URL;
+  if (!override) return DEFAULT_BASE_URL;
+
+  let parsed: URL;
+  try {
+    parsed = new URL(override);
+  } catch {
+    throw new Error(`PROXIDIZE_BASE_URL is not a valid URL: ${override}`);
+  }
+
+  const isProxidizeDomain =
+    parsed.protocol === "https:" &&
+    (parsed.hostname === "proxidize.com" ||
+      parsed.hostname.endsWith(".proxidize.com"));
+  const isLoopback = LOOPBACK_HOSTNAMES.has(parsed.hostname);
+
+  if (!isProxidizeDomain && !isLoopback) {
+    throw new Error(
+      `PROXIDIZE_BASE_URL must be an HTTPS *.proxidize.com URL (or a loopback address for local testing); the API token is never sent elsewhere. Got: ${override}`
+    );
+  }
+
+  return override;
+}
+
 export const config = {
   token,
-  baseUrl:
-    process.env.PROXIDIZE_BASE_URL || "https://api.proxidize.com/api/v1",
+  baseUrl: resolveBaseUrl(),
   proxyHost: process.env.PROXIDIZE_PROXY_HOST || "pg.proxi.es",
   timeout: parseInt(process.env.PROXIDIZE_TIMEOUT || "30000", 10),
   maxRetries: Math.min(
