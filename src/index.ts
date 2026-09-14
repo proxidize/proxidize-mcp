@@ -56,7 +56,7 @@ async function main() {
         "Proxidize proxy management server. Use these tools when the user asks about " +
         "managing mobile proxies, rotating IPs, checking proxy status, listing locations " +
         "or carriers, managing IP whitelists, tagging proxies, or viewing data usage. " +
-        "Supports per-proxy dedicated mobile proxies and per-GB mobile/residential proxies.\n\n" +
+        "Supports per-proxy and per-GB proxies.\n\n" +
         `Proxies are reached through the gateway host ${config.proxyHost}. ` +
         "Per-proxy responses include ready-to-use http_url and socks_url values. " +
         "The proxy field is 'username:password' credentials: HTTP ports accept them " +
