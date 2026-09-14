@@ -116,7 +116,7 @@ Add to `.mcp.json` or your IDE's MCP config:
 | `get_subscription` | List active subscriptions, optionally filtered to one plan type |
 | `get_outbound_ip` | Get the public IP of the machine running this MCP server (for IP whitelisting) |
 
-### Per Proxy (Dedicated Mobile Proxies)
+### Per Proxy
 
 | Tool | Description |
 |------|-------------|
