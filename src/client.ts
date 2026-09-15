@@ -29,6 +29,8 @@ const http = axios.create({
 
 rax.attach(http);
 
+const MAX_ERROR_MESSAGE_LENGTH = 500;
+
 function formatError(err: unknown): Error {
   if (!axios.isAxiosError(err) || !err.response) {
     return err instanceof Error ? err : new Error(String(err));
@@ -36,12 +38,26 @@ function formatError(err: unknown): Error {
 
   const status = err.response.status;
   const body = err.response.data;
-  const msg =
-    typeof body === "object" && body !== null
-      ? (body as Record<string, unknown>).message ||
-        (body as Record<string, unknown>).detail ||
+  const contentType = String(err.response.headers?.["content-type"] ?? "");
+
+  let msg: string;
+  if (typeof body === "object" && body !== null) {
+    msg = String(
+      (body as Record<string, unknown>).message ??
+        (body as Record<string, unknown>).detail ??
         JSON.stringify(body)
-      : String(body);
+    );
+  } else if (contentType.includes("html") || /^\s*<(!doctype|html)/i.test(String(body))) {
+    msg = /cloudflare/i.test(String(body))
+      ? "blocked by Cloudflare before reaching the API (likely a bot/rate-limit challenge on the base URL's host)"
+      : "server returned an HTML error page instead of JSON";
+  } else {
+    msg = String(body);
+  }
+
+  if (msg.length > MAX_ERROR_MESSAGE_LENGTH) {
+    msg = msg.slice(0, MAX_ERROR_MESSAGE_LENGTH) + "… (truncated)";
+  }
 
   return new Error(`HTTP ${status}: ${msg}`);
 }
