@@ -105,6 +105,8 @@ Add to `.mcp.json` or your IDE's MCP config:
 2. Click the avatar dropdown → **Settings**
 3. Copy your API token
 
+> **Note:** Proxy access requires identity verification. [KYC](https://proxidize.com/kyc/) (government-issued photo ID) is required for all accounts before the proxy Services are usable; business accounts needing unlimited connection threads or access to verification-gated site categories also need KYB (business verification, via sales).
+
 ---
 
 ## Available Tools
