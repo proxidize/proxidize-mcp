@@ -81,7 +81,9 @@ export function registerPerProxyTools(server: McpServer, username: string) {
       inputSchema: {
         session_id: z
           .string()
-          .describe("Session ID of the proxy to rotate"),
+          .describe(
+            "Session ID of the proxy to rotate (from list_proxies or proxy string after '-s-')"
+          ),
         city: z
           .string()
           .optional()
@@ -159,7 +161,11 @@ export function registerPerProxyTools(server: McpServer, username: string) {
       description:
         "Set automatic IP rotation interval for a proxy. Use -1 to disable.",
       inputSchema: {
-        session_id: z.string().describe("Session ID of the proxy"),
+        session_id: z
+          .string()
+          .describe(
+            "Session ID of the proxy (from list_proxies or proxy string after '-s-')"
+          ),
         public_key: z
           .string()
           .describe("Public key token from the proxy's rotate URL"),
@@ -364,7 +370,11 @@ export function registerPerProxyTools(server: McpServer, username: string) {
       description: "Assign an existing tag to a proxy session",
       inputSchema: {
         tag_id: z.number().int().describe("Tag ID"),
-        session_id: z.string().describe("Proxy session ID to tag"),
+        session_id: z
+          .string()
+          .describe(
+            "Proxy session ID to tag (from list_proxies or proxy string after '-s-')"
+          ),
       },
       outputSchema: outputSchemas.tagSession,
       annotations: {
@@ -390,7 +400,11 @@ export function registerPerProxyTools(server: McpServer, username: string) {
       description: "Remove a tag from a proxy session",
       inputSchema: {
         tag_id: z.number().int().describe("Tag ID"),
-        session_id: z.string().describe("Proxy session ID to untag"),
+        session_id: z
+          .string()
+          .describe(
+            "Proxy session ID to untag (from list_proxies or proxy string after '-s-')"
+          ),
       },
       outputSchema: outputSchemas.tagSession,
       annotations: {
