@@ -113,11 +113,26 @@ export function registerPerProxyTools(server: McpServer, username: string) {
       if (city) filter.city = city;
       if (carrier) filter.carrier = carrier;
 
-      const data = await post<{ message: string }>("/perproxy/rotate", {
-        username,
-        key: session_id,
-        filter,
-      });
+      let data: { message: string };
+      try {
+        data = await post<{ message: string }>("/perproxy/rotate", {
+          username,
+          key: session_id,
+          filter,
+        });
+      } catch (err) {
+        if (
+          (city || carrier) &&
+          err instanceof Error &&
+          /^HTTP 400:/.test(err.message)
+        ) {
+          throw new Error(
+            `${err.message} — the requested city/carrier may be unavailable or ` +
+              "temporarily out of capacity. Retry without the filter, or with a different city/carrier."
+          );
+        }
+        throw err;
+      }
 
       let newIp = await fetchIp();
       for (let attempt = 0; attempt < 3 && newIp === oldIp; attempt++) {
