@@ -59,7 +59,12 @@ function formatError(err: unknown): Error {
     msg = msg.slice(0, MAX_ERROR_MESSAGE_LENGTH) + "… (truncated)";
   }
 
-  return new Error(`HTTP ${status}: ${msg}`);
+  const authHint =
+    status === 401 || status === 403
+      ? " (this is a credential/authorization problem — check that PROXIDIZE_API_TOKEN is set correctly; it is not an account or subscription issue)"
+      : "";
+
+  return new Error(`HTTP ${status}: ${msg}${authHint}`);
 }
 
 export async function request<T = unknown>(
