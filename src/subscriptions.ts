@@ -15,7 +15,14 @@ export type CanonicalSubscriptionType = z.infer<
 >;
 
 export function toLegacyWireType(type: CanonicalSubscriptionType): string {
-  return type === "per_proxy_mobile" ? "per_proxy" : "per_gb";
+  switch (type) {
+    case "per_proxy_mobile":
+      return "per_proxy";
+    case "per_gb_residential":
+      return "residential_per_gb";
+    case "per_gb_mobile":
+      return "per_gb";
+  }
 }
 
 type SubscriptionResponse = {
