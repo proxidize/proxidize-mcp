@@ -28,6 +28,7 @@ export function instrumentServer(server: McpServer): PostHog | null {
   const posthog = new PostHog(token, { host, enableExceptionAutocapture: true });
   instrument(server, posthog, {
     logger: (message) => logger.warn(message),
+    reportMissing: true,
     beforeSend: (event) => {
       if (event.properties) {
         // Tool responses embed live proxy credentials (http_url etc.) —
