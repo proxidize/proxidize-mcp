@@ -35,14 +35,18 @@ export function registerPerProxyTools(server: McpServer, username: string) {
           .positive()
           .optional()
           .describe("Results per page"),
+        include_history: z
+          .boolean()
+          .optional()
+          .describe("Include deleted/historical proxy sessions"),
       },
       outputSchema: outputSchemas.paginatedProxies,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
-    async ({ page, page_size }) => {
+    async ({ page, page_size, include_history }) => {
       const data = await get<Paginated<ApiProxy>>(
         `/perproxy/proxies/${username}`,
-        { page, page_size }
+        { page, page_size, include_history }
       );
       return ok({ ...data, data: data.data.map(withConnectionUrls) });
     }
