@@ -105,21 +105,21 @@ function registerForNetwork(
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async ({ city, state, country }) => {
-      const params: Record<string, string> = {};
-      if (city) params.city = city;
-      if (state) params.state = state;
-      if (country) params.country = country;
+      let params: Record<string, string>;
+      if (network === "residential") {
+        params = {};
+        if (country) params.location = country;
+      } else {
+        params = {};
+        if (city) params.city = city;
+        if (state) params.state = state;
+        if (country) params.country = country;
+      }
 
-      let carriers = await get<Carrier[]>(
+      const carriers = await get<Carrier[]>(
         `${prefix(network)}/carriers-proxy`,
         params
       );
-
-      if (country) {
-        const norm = (s: string) => s.toLowerCase().replace(/[\s-]+/g, "");
-        const target = norm(country);
-        carriers = carriers.filter((c) => norm(c.country) === target);
-      }
 
       return ok({ carriers });
     }
