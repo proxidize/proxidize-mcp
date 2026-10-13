@@ -108,6 +108,19 @@ function iso(unixSeconds: number): string {
   return new Date(unixSeconds * 1000).toISOString();
 }
 
+const BLOCKED_DOMAIN_HINT =
+  "Some requests were blocked before reaching the destination (errorType mentions 'blocked domain'). " +
+  "This is Proxidize's Acceptable Use Policy, not an account or token problem. Financial, HR/recruitment " +
+  "(e.g. workday/myworkdayjobs.com), and consumer-review sites are blocked for accounts with only KYC " +
+  "(individual) verification — a KYB (business) verification removes that restriction. A separate set of " +
+  "categories (adult, crypto, gambling, streaming, government/military, etc.) stays blocked for every " +
+  "account regardless of tier. See https://proxidize.com/kyc/ for the verification tiers and full blocked-" +
+  "category list, or check the account's verification status in the Proxidize dashboard under Settings.";
+
+function isBlockedDomainError(errorType: unknown): boolean {
+  return typeof errorType === "string" && /blocked[_\s-]?domain/i.test(errorType);
+}
+
 const windowInputSchema = {
   hours: z
     .number()
@@ -333,7 +346,10 @@ export function registerAnalyticsTools(server: McpServer, users: ActivePlanUsers
         "Per-request connection log for your proxies: URL, method, status, duration, bytes up/down, " +
         "source IP, upstream carrier/geo, session, and errors. Newest first. " +
         "Defaults to the last 24 hours across all active plans. " +
-        "When plan is omitted, results are merged across plans and offset applies within each plan.",
+        "When plan is omitted, results are merged across plans and offset applies within each plan. " +
+        "A 'blocked domain' errorType means the destination is restricted by Proxidize's Acceptable Use " +
+        "Policy (not an auth/token problem) — some categories need KYB verification to unlock, see the " +
+        "returned hint field or https://proxidize.com/kyc/.",
       inputSchema: {
         ...windowInputSchema,
         url_contains: z
@@ -383,11 +399,16 @@ export function registerAnalyticsTools(server: McpServer, users: ActivePlanUsers
         .slice(0, pageLimit)
         .map((item) => ({ ...item, timestamp: iso(item.timestamp) }));
 
+      const hasBlockedDomain = entries.some((item) =>
+        isBlockedDomainError((item as { errorType?: unknown }).errorType)
+      );
+
       return ok({
         window: { from: iso(fromTs), to: iso(toTs) },
         total: results.reduce((sum, res) => sum + res.analyticsEntries.totalCount, 0),
         returned: entries.length,
         entries,
+        ...(hasBlockedDomain ? { hint: BLOCKED_DOMAIN_HINT } : {}),
       });
     }
   );

@@ -244,6 +244,10 @@ Double-check the token hasn't been regenerated since you configured the server.
 
 Increase the timeout: set `PROXIDIZE_TIMEOUT` to `60000` in your env config.
 
+### Requests to a domain fail with "Blocked Domain" / `BLOCKED_DOMAIN`
+
+This isn't a token or account problem — it's Proxidize's Acceptable Use Policy blocking the destination before the request leaves the network. Accounts with only KYC (individual identity) verification are blocked from financial, HR/recruitment (e.g. `myworkdayjobs.com`), and consumer-review sites; KYB (business) verification unlocks those categories. A separate list (adult, crypto, gambling, streaming, government/military, etc.) stays blocked for every account regardless of tier. See [proxidize.com/kyc](https://proxidize.com/kyc/) for the verification tiers and full blocked-category list, or check your account's verification status in the Proxidize dashboard under Settings. `get_connection_history` surfaces a hint automatically when it sees this error type.
+
 ---
 
 ## Development
