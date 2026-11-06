@@ -204,7 +204,9 @@ On startup the server queries the subscription API to discover your active plans
 - **`per_gb_mobile`** → 9 mobile tools
 - **`per_gb_residential`** → 9 residential tools
 - **Any active plan** → 3 analytics tools
-- **Always loaded** → `get_subscription`, `get_outbound_ip`
+- **Always loaded** → `get_subscription`, `get_outbound_ip`, `request_feature`
+
+`request_feature` drafts a GitHub issue for a capability the server lacks and returns a pre-filled link. Nothing is posted automatically: you review and submit it yourself. The agent is instructed to include only the generic missing capability, never credentials, IPs, IDs, or anything about you, and a redaction pass strips common secret patterns as a backstop.
 
 No subscription, no subscription-specific tools. Nothing is exposed that your account can't use.
 
