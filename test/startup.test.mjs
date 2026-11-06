@@ -20,8 +20,8 @@ function subscription(typeName, username, extra = {}) {
 
 const subscriptionsByLegacyType = {
   per_proxy: [subscription("per_proxy_mobile", "per-proxy-user", { modem_count: 1 })],
-  per_gb: [
-    subscription("per_gb_mobile", "mobile-user"),
+  per_gb: [subscription("per_gb_mobile", "mobile-user")],
+  residential_per_gb: [
     subscription("per_gb_residential", "residential-user"),
   ],
 };
@@ -82,11 +82,11 @@ test("discovers tools via legacy wire filters with canonical responses", async (
       (tool) => tool.name === "get_subscription"
     );
 
-    assert.equal(tools.length, 37);
+    assert.equal(tools.length, 38);
     assert.ok(tools.some((tool) => tool.name === "get_traffic_analytics"));
     assert.ok(tools.some((tool) => tool.name === "get_top_domains"));
     assert.ok(tools.some((tool) => tool.name === "get_connection_history"));
-    assert.deepEqual(requestedTypes.sort(), ["per_gb", "per_gb", "per_proxy"]);
+    assert.deepEqual(requestedTypes.sort(), ["per_gb", "per_proxy", "residential_per_gb"]);
     assert.ok(
       authorizationHeaders.every((header) => header === "Bearer test-token")
     );

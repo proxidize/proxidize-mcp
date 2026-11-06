@@ -28,7 +28,7 @@ test("exposes only canonical subscription types", () => {
 test("maps canonical types to the legacy wire filter values", () => {
   assert.equal(toLegacyWireType("per_proxy_mobile"), "per_proxy");
   assert.equal(toLegacyWireType("per_gb_mobile"), "per_gb");
-  assert.equal(toLegacyWireType("per_gb_residential"), "per_gb");
+  assert.equal(toLegacyWireType("per_gb_residential"), "residential_per_gb");
 });
 
 test("keeps subscriptions matching the requested canonical type", () => {
