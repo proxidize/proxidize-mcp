@@ -7,6 +7,7 @@ import { config } from "./config.js";
 import { logger } from "./logger.js";
 import { registerAccountTools } from "./tools/account.js";
 import { registerAnalyticsTools } from "./tools/analytics.js";
+import { registerFeedbackTools } from "./tools/feedback.js";
 import { registerPerProxyTools } from "./tools/per-proxy.js";
 import { registerPerGbTools } from "./tools/per-gb.js";
 import { instrumentServer } from "./telemetry.js";
@@ -65,13 +66,17 @@ async function main() {
         "then create_ip_whitelist).\n\n" +
         "Analytics tools (get_traffic_analytics, get_top_domains, get_connection_history) " +
         "answer questions about what the proxies actually did: bandwidth over time, " +
-        "top destination domains, and a per-request connection log with errors.",
+        "top destination domains, and a per-request connection log with errors.\n\n" +
+        "If the user asks for something none of these tools can do, and you have confirmed that, " +
+        "offer to draft a feature request with request_feature. Ask first, describe only the " +
+        "missing capability generically, and never include anything sensitive or about the user.",
     }
   );
 
   const posthog = instrumentServer(server);
 
   registerAccountTools(server);
+  registerFeedbackTools(server);
 
   if (perProxyUser) {
     registerPerProxyTools(server, perProxyUser);
