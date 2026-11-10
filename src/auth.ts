@@ -123,12 +123,16 @@ export function createAuth(cfg: AuthConfig, fetchImpl: typeof fetch = fetch) {
       access_token?: string;
       expires_in?: number;
       error?: string;
+      error_description?: string;
     };
     if (!res.ok || !data.access_token) {
       // invalid_grant = Auth0 refused the user's token (revoked, consent
       // missing, ...): the client should sign in again. Anything else is ours.
       const kind = data.error === "invalid_grant" ? "invalid_token" : "server_error";
-      throw new AuthError(`token exchange refused (${res.status} ${data.error ?? "no error code"})`, kind);
+      // Auth0's error_description names the cause (client auth, grant, policy); it
+      // never contains the tokens or the secret.
+      const why = data.error_description ? `: ${String(data.error_description).slice(0, 300)}` : "";
+      throw new AuthError(`token exchange refused (${res.status} ${data.error ?? "no error code"}${why})`, kind);
     }
 
     const lifetime = Number(data.expires_in) > 0 ? Number(data.expires_in) : 300;
