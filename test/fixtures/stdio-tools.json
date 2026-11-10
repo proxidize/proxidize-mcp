@@ -324,13 +324,9 @@
                   "type": "number"
                 },
                 "interval": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "http_port": {
@@ -471,13 +467,9 @@
             "type": "number"
           },
           "interval": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "number",
+              "null"
             ]
           },
           "http_port": {
@@ -556,23 +548,15 @@
             "type": "string"
           },
           "old_ip": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "new_ip": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           }
         },
@@ -1246,13 +1230,9 @@
             "type": "number"
           },
           "super_user": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "is_sub_user": {
@@ -1496,43 +1476,27 @@
                   "type": "string"
                 },
                 "carrier": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "city": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "city_name": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "country": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "hostname": {
@@ -1550,13 +1514,9 @@
                   ]
                 },
                 "ip_mode": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "proxy_type": {
@@ -1645,13 +1605,9 @@
                   "type": "number"
                 },
                 "super_user": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "is_sub_user": {
@@ -2011,13 +1967,9 @@
             "type": "number"
           },
           "super_user": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
+            "type": [
+              "string",
+              "null"
             ]
           },
           "is_sub_user": {
@@ -2261,43 +2213,27 @@
                   "type": "string"
                 },
                 "carrier": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "city": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "city_name": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "country": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "hostname": {
@@ -2315,13 +2251,9 @@
                   ]
                 },
                 "ip_mode": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "proxy_type": {
@@ -2410,13 +2342,9 @@
                   "type": "number"
                 },
                 "super_user": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "string",
+                    "null"
                   ]
                 },
                 "is_sub_user": {

@@ -41,15 +41,15 @@
   "author": "Proxidize",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "@posthog/mcp": "0.10.0",
     "@toolprint/mcp-logger": "^0.0.7",
-    "axios": "^1.16.1",
+    "axios": "^1.20.0",
     "express": "^5.2.1",
     "jose": "^6.2.3",
     "posthog-node": "5.46.1",
     "retry-axios": "^4.0.3",
-    "zod": "^4.4.3"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
