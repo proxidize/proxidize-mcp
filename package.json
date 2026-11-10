@@ -26,6 +26,7 @@
     "test": "npm run build && node --test test/*.test.mjs",
     "prepare": "npm run build",
     "start": "node dist/index.js",
+    "start:http": "node dist/http.js",
     "dev": "tsc --watch"
   },
   "engines": {
@@ -44,11 +45,14 @@
     "@posthog/mcp": "0.10.0",
     "@toolprint/mcp-logger": "^0.0.7",
     "axios": "^1.16.1",
+    "express": "^5.2.1",
+    "jose": "^6.2.3",
     "posthog-node": "5.46.1",
     "retry-axios": "^4.0.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^25.8.0",
     "shx": "^0.4.0",
     "typescript": "^6.0.3"

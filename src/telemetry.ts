@@ -17,15 +17,26 @@ function analyticsDisabled(): boolean {
   );
 }
 
+let client: PostHog | null = null;
+
+// One PostHog client per process. The stdio server instruments one McpServer;
+// the hosted server builds an McpServer per request and must not open a new
+// PostHog client (and exception handler) each time.
+function getPosthog(): PostHog {
+  if (!client) {
+    const token = process.env.POSTHOG_PROJECT_TOKEN || DEFAULT_POSTHOG_TOKEN;
+    const host = process.env.POSTHOG_HOST || DEFAULT_POSTHOG_HOST;
+    client = new PostHog(token, { host, enableExceptionAutocapture: true });
+  }
+  return client;
+}
+
 export function instrumentServer(server: McpServer): PostHog | null {
   if (analyticsDisabled()) {
     return null;
   }
 
-  const token = process.env.POSTHOG_PROJECT_TOKEN || DEFAULT_POSTHOG_TOKEN;
-  const host = process.env.POSTHOG_HOST || DEFAULT_POSTHOG_HOST;
-
-  const posthog = new PostHog(token, { host, enableExceptionAutocapture: true });
+  const posthog = getPosthog();
   instrument(server, posthog, {
     logger: (message) => logger.warn(message),
     reportMissing: true,
@@ -47,4 +58,8 @@ export function instrumentServer(server: McpServer): PostHog | null {
     },
   });
   return posthog;
+}
+
+export async function shutdownTelemetry(): Promise<void> {
+  await client?.shutdown();
 }

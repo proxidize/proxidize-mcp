@@ -269,6 +269,27 @@ Then point your MCP client at the build output — e.g. `claude mcp add proxidiz
 
 Run the test suite with `npm test` (no credentials needed — it boots the server against a mock API).
 
+### Hosted (remote) server
+
+`dist/index.js` is the local stdio server above and is what `npx @proxidize/mcp` runs. `dist/http.js` is a separate entry point that serves the same tools over [Streamable HTTP](https://modelcontextprotocol.io/specification/latest/basic/transports) for remote clients such as ChatGPT and Claude, with each user signing in through OAuth instead of pasting an API token. It is meant to run behind a TLS reverse proxy.
+
+- `POST /mcp` — stateless MCP endpoint; every request needs `Authorization: Bearer <access token>`.
+- `GET /.well-known/oauth-protected-resource[/mcp]` — protected resource metadata (RFC 9728) naming the authorization server.
+- `GET /healthz` — liveness check.
+
+The access token must be issued by `AUTH0_ISSUER` for this server (audience `<MCP_PUBLIC_URL>/mcp`); anything else gets a `401`. The server never forwards that token: it exchanges it (RFC 8693 token exchange) for a token scoped to the Proxidize API and calls the API with that. `get_outbound_ip` is not offered remotely, since it would report the server's IP rather than the user's.
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `MCP_PUBLIC_URL` | Yes | — | Public origin, e.g. `https://mcp.example.com` |
+| `AUTH0_ISSUER` | Yes | — | Issuer URL with trailing slash |
+| `MCP_AUTH0_CLIENT_ID` / `MCP_AUTH0_CLIENT_SECRET` | Yes | — | Client used for the token exchange |
+| `PROXIDIZE_API_AUDIENCE` | Yes | — | Audience of the Proxidize API |
+| `MCP_AUTH0_EXCHANGE_SCOPE` | No | — | Scope to request in the exchange |
+| `MCP_HOST` / `MCP_PORT` | No | `127.0.0.1` / `8096` | Listen address |
+
+`PROXIDIZE_BASE_URL`, `PROXIDIZE_TIMEOUT`, `PROXIDIZE_MAX_RETRIES` and the analytics opt-outs apply as above. Start it with `npm run start:http`.
+
 ---
 
 ## License

@@ -34,7 +34,10 @@ async function getAllSubscriptions(): Promise<Paginated<Subscription>> {
   return { perPage: data.length, page: 1, total: data.length, data };
 }
 
-export function registerAccountTools(server: McpServer) {
+export function registerAccountTools(
+  server: McpServer,
+  options: { outboundIp?: boolean } = {}
+) {
   server.registerTool(
     "get_subscription",
     {
@@ -64,6 +67,12 @@ export function registerAccountTools(server: McpServer) {
       return ok(data);
     }
   );
+
+  // get_outbound_ip reports the IP of the machine running this server. Locally
+  // that is the user's own machine (what they want to whitelist). On the hosted
+  // server it would be OUR server's IP, a wrong answer that could get our box
+  // whitelisted on a customer's proxies, so the hosted server leaves it out.
+  if (options.outboundIp === false) return;
 
   server.registerTool(
     "get_outbound_ip",
