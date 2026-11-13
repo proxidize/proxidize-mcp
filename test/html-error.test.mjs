@@ -42,7 +42,7 @@ test("surfaces a concise message when the API host returns an HTML error page", 
     const text = result.content?.[0]?.text ?? "";
     assert.match(text, /HTTP 403: blocked by Cloudflare/);
     assert.doesNotMatch(text, /<!DOCTYPE html>/i);
-    assert.ok(text.length < 300, `expected a concise error, got ${text.length} chars`);
+    assert.ok(text.length < 700, `expected a concise error, got ${text.length} chars`);
   } finally {
     await client.close();
     await new Promise((resolve, reject) =>

@@ -102,8 +102,10 @@ Add to `.mcp.json` or your IDE's MCP config:
 ### Get your API token
 
 1. Log in to the [Proxidize Dashboard](https://app.proxidize.com)
-2. Click the avatar dropdown → **Settings**
+2. Open [Settings](https://www.app.proxidize.com/settings/) and click **API Token**
 3. Copy your API token
+
+See the [setup guide](https://help.proxidize.com/tools/proxidize-mcp-server) for more detail.
 
 > **Note:** You need an active Proxidize subscription to use this MCP server — tool calls will fail even with a valid API token if your account has no active plan.
 

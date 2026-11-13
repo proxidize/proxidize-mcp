@@ -61,7 +61,12 @@ function formatError(err: unknown): Error {
 
   const authHint =
     status === 401 || status === 403
-      ? " (this is a credential/authorization problem — check that PROXIDIZE_API_TOKEN is set correctly; it is not an account or subscription issue)"
+      ? ". Your PROXIDIZE_API_TOKEN was rejected. To fix it: " +
+        '1) go to https://www.app.proxidize.com/settings/ and click "API Token"; ' +
+        '2) copy the token and set it as PROXIDIZE_API_TOKEN in your MCP config (the "Bearer " prefix is optional); ' +
+        "3) restart your MCP client. " +
+        "If it still fails, make sure your account has an active Proxidize subscription. " +
+        "Setup guide: https://help.proxidize.com/tools/proxidize-mcp-server"
       : "";
 
   return new Error(`HTTP ${status}: ${msg}${authHint}`);
