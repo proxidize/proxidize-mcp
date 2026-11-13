@@ -84,7 +84,7 @@ async function main() {
   }
 
   registerPerGbTools(server, perGbUser, resiUser);
-  const gbCount = (perGbUser ? 9 : 0) + (resiUser ? 9 : 0);
+  const gbCount = (perGbUser ? 9 : 0) + (resiUser ? 10 : 0);
   if (gbCount > 0) {
     logger.info(`registered per-gb tools (${gbCount})`);
   }
