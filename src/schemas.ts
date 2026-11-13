@@ -115,6 +115,15 @@ export const AccessPointSettingsSchema = z.looseObject({
 });
 export type AccessPointSettings = z.infer<typeof AccessPointSettingsSchema>;
 
+export const ProxyUrlSchema = z.looseObject({
+  username: z.string(),
+  password: z.string(),
+  host: z.string(),
+  port: z.number().int(),
+  session: z.string().nullable(),
+  proxy_url: z.string(),
+});
+
 export const MessageResponseSchema = z.looseObject({
   message: z.string(),
 });
@@ -229,6 +238,7 @@ export const outputSchemas = {
   deleteTag: DeleteTagResponseSchema,
   tagSession: TagSessionResponseSchema,
   message: MessageResponseSchema,
+  proxyUrl: ProxyUrlSchema,
   rotateResult: RotateResultSchema,
   ipWhitelist: IpWhitelistResponseSchema,
   locationSummary: z.looseObject({ locations: z.array(LocationSummaryGroupSchema) }),

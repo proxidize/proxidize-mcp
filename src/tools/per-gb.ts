@@ -1,6 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { get, post, put } from "../client.js";
+import { randomBytes } from "node:crypto";
+import { config } from "../config.js";
 import { ok } from "../result.js";
 import { outputSchemas } from "../schemas.js";
 import type {
@@ -208,6 +210,109 @@ function registerForNetwork(
       return ok(data);
     }
   );
+
+  if (network === "residential") {
+    server.registerTool(
+      "residential_build_proxy_url",
+      {
+        title: "Build Residential Proxy URL",
+        description:
+          "Build a ready-to-use residential proxy URL for an access point, with optional targeting and a sticky session. " +
+          "Changing the session value gives a new IP; omit it (new_ip_per_request) for a new IP on every request. " +
+          "Sticky sessions last roughly 1-3 hours, set by the ISP — the duration is not configurable, so for short-lived " +
+          "sessions generate a new session value when you need a fresh IP. Does not send any traffic.",
+        inputSchema: {
+          access_point: z
+            .string()
+            .optional()
+            .describe(
+              "Access point username (from residential_list_access_points). Defaults to the main account user."
+            ),
+          session: z
+            .string()
+            .regex(/^[A-Za-z0-9]{1,256}$/)
+            .optional()
+            .describe(
+              "Sticky session name, letters and digits only. Auto-generated if omitted."
+            ),
+          new_ip_per_request: z
+            .boolean()
+            .optional()
+            .describe("Omit the session so every request gets a new IP"),
+          country: z
+            .string()
+            .regex(/^[A-Za-z]{2}$/)
+            .optional()
+            .describe("Two-letter country code (e.g. 'US')"),
+          state: z.string().optional().describe("State name, e.g. 'Texas'"),
+          city: z.string().optional().describe("City name, e.g. 'Dallas'"),
+          isp: z
+            .string()
+            .regex(/^\d+$/)
+            .optional()
+            .describe("Numeric ISP ID (from residential_list_carriers)"),
+          protocol: z
+            .enum(["http", "socks5"])
+            .optional()
+            .describe("Protocol (default http)"),
+        },
+        outputSchema: outputSchemas.proxyUrl,
+        annotations: { readOnlyHint: true, openWorldHint: false },
+      },
+      async ({
+        access_point,
+        session,
+        new_ip_per_request,
+        country,
+        state,
+        city,
+        isp,
+        protocol,
+      }) => {
+        const [info, accessPoints] = await Promise.all([
+          get<Partial<PerGbUser>>(`${prefix(network)}/user-info`),
+          get<PerGbUser[]>(`${prefix(network)}/access-point`),
+        ]);
+        const candidates = [info, ...accessPoints].filter(
+          (u): u is PerGbUser => Boolean(u.username && u.password)
+        );
+        const target = access_point ?? info.username ?? superUser;
+        const user = candidates.find((u) => u.username === target);
+        if (!user) {
+          throw new Error(
+            `Access point '${target}' not found. Use residential_list_access_points to see valid usernames.`
+          );
+        }
+
+        const sessionValue = new_ip_per_request
+          ? null
+          : (session ?? randomBytes(6).toString("hex"));
+        const noSpaces = (v: string) => v.replace(/\s+/g, "");
+
+        let username = user.username;
+        if (sessionValue) username += `-s-${sessionValue}`;
+        if (country) username += `-co-${country.toUpperCase()}`;
+        if (state) username += `-st-${noSpaces(state)}`;
+        if (city) username += `-ci-${noSpaces(city)}`;
+        if (isp) username += `-c-${isp}`;
+        username += "-type-residential";
+
+        const socks = protocol === "socks5";
+        const port = socks ? 20002 : 20000;
+        const scheme = socks ? "socks5h" : "http";
+        const proxy_url = `${scheme}://${encodeURIComponent(username)}:${encodeURIComponent(user.password)}@${config.proxyHost}:${port}`;
+
+        return ok({
+          username,
+          password: user.password,
+          host: config.proxyHost,
+          port,
+          session: sessionValue,
+          proxy_url,
+        });
+      }
+    );
+  }
 
   server.registerTool(
     `${tag}_create_access_point`,

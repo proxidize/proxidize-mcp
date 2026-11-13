@@ -82,7 +82,7 @@ test("discovers tools via legacy wire filters with canonical responses", async (
       (tool) => tool.name === "get_subscription"
     );
 
-    assert.equal(tools.length, 38);
+    assert.equal(tools.length, 39);
     assert.ok(tools.some((tool) => tool.name === "get_traffic_analytics"));
     assert.ok(tools.some((tool) => tool.name === "get_top_domains"));
     assert.ok(tools.some((tool) => tool.name === "get_connection_history"));
