@@ -26,7 +26,8 @@ export function registerPerProxyTools(server: McpServer, username: string) {
     {
       title: "List Proxies",
       description:
-        "List all per-proxy mobile proxies with their IPs, ports, speeds, and usage",
+        "List all per-proxy mobile proxies with ready-to-use http_url and socks_url credentials, " +
+        "the current IP, ports, speed, usage, and any city/carrier lock (filter)",
       inputSchema: {
         page: z.number().int().positive().optional().describe("Page number"),
         page_size: z
