@@ -214,7 +214,7 @@
     {
       "name": "list_proxies",
       "title": "List Proxies",
-      "description": "List all per-proxy mobile proxies with their IPs, ports, speeds, and usage",
+      "description": "List all per-proxy mobile proxies with ready-to-use http_url and socks_url credentials, the current IP, ports, speed, usage, and any city/carrier lock (filter)",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2464,6 +2464,101 @@
         "destructiveHint": false,
         "idempotentHint": true,
         "openWorldHint": true
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      }
+    },
+    {
+      "name": "residential_build_proxy_url",
+      "title": "Build Residential Proxy URL",
+      "description": "Build a ready-to-use residential proxy URL for an access point, with optional targeting and a sticky session. Changing the session value gives a new IP; omit it (new_ip_per_request) for a new IP on every request. Sticky sessions last roughly 1-3 hours, set by the ISP — the duration is not configurable, so for short-lived sessions generate a new session value when you need a fresh IP. Does not send any traffic.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "access_point": {
+            "description": "Access point username (from residential_list_access_points). Defaults to the main account user.",
+            "type": "string"
+          },
+          "session": {
+            "description": "Sticky session name, letters and digits only. Auto-generated if omitted.",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]{1,256}$"
+          },
+          "new_ip_per_request": {
+            "description": "Omit the session so every request gets a new IP",
+            "type": "boolean"
+          },
+          "country": {
+            "description": "Two-letter country code (e.g. 'US')",
+            "type": "string",
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "state": {
+            "description": "State name, e.g. 'Texas'",
+            "type": "string"
+          },
+          "city": {
+            "description": "City name, e.g. 'Dallas'",
+            "type": "string"
+          },
+          "isp": {
+            "description": "Numeric ISP ID (from residential_list_carriers)",
+            "type": "string",
+            "pattern": "^\\d+$"
+          },
+          "protocol": {
+            "description": "Protocol (default http)",
+            "type": "string",
+            "enum": [
+              "http",
+              "socks5"
+            ]
+          }
+        },
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "session": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "proxy_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password",
+          "host",
+          "port",
+          "session",
+          "proxy_url"
+        ],
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "additionalProperties": {}
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false
       },
       "execution": {
         "taskSupport": "forbidden"

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createServer, request } from "node:http";
+import { readFileSync } from "node:fs";
 import { after, before, test } from "node:test";
 
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
@@ -162,7 +163,13 @@ test("valid user: hosted tool list = stdio list minus get_outbound_ip; API sees 
   const client = await connect(userToken);
   try {
     const { tools } = await client.listTools();
-    assert.equal(tools.length, 37);
+    // Same surface as the local (stdio) server for an account with every plan,
+    // minus get_outbound_ip (it would report the hosted server's own IP).
+    const stdioNames = JSON.parse(readFileSync("test/fixtures/stdio-tools.json", "utf8")).tools.map((t) => t.name);
+    assert.deepEqual(
+      tools.map((t) => t.name).sort(),
+      stdioNames.filter((n) => n !== "get_outbound_ip").sort()
+    );
     assert.ok(!tools.some((t) => t.name === "get_outbound_ip"));
     assert.ok(tools.some((t) => t.name === "list_proxies"));
     assert.doesNotMatch(client.getInstructions(), /get_outbound_ip/);
@@ -256,6 +263,34 @@ test("unknown Host header is refused", async () => {
     r.end();
   });
   assert.equal(status, 403);
+});
+
+test("concurrent first requests from one user share a single token exchange", async () => {
+  const fresh = await token({ sub: "auth0|user-a", exp: "9m" });
+  const before = exchanges.filter((e) => e.subject_token === fresh).length;
+  const body = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" });
+  const statuses = await Promise.all(
+    Array.from({ length: 8 }, () =>
+      fetch(mcpUrl, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${fresh}`, "Content-Type": "application/json", Accept: "application/json, text/event-stream" },
+        body,
+      }).then((r) => r.status)
+    )
+  );
+  assert.ok(statuses.every((s) => s === 200), JSON.stringify(statuses));
+  assert.equal(exchanges.filter((e) => e.subject_token === fresh).length - before, 1);
+});
+
+test("an oversized body keeps its client-error status and leaks nothing", async () => {
+  const res = await fetch(mcpUrl, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${await token()}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ pad: "x".repeat(200_000) }),
+  });
+  assert.equal(res.status, 413);
+  const text = await res.text();
+  assert.doesNotMatch(text, /at .*\.js|node_modules|PayloadTooLarge/);
 });
 
 test("GET /mcp is 405 and a malformed body is a JSON 400 with no stack trace", async () => {

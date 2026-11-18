@@ -14,14 +14,14 @@ import { createRemoteJWKSet, jwtVerify, errors as joseErrors } from "jose";
  */
 
 export interface AuthConfig {
-  /** Auth0 issuer, with trailing slash, e.g. https://auth.proxidize.com/ */
+  /** Auth0 issuer, with trailing slash, e.g. https://your-tenant.us.auth0.com/ */
   issuer: string;
   /** This server's resource identifier = the Auth0 API identifier for the MCP. */
   resource: string;
   /** Auth0 client registered with app_type resource_server for the MCP API. */
   clientId: string;
   clientSecret: string;
-  /** Audience of the Proxidize API (the backend's AUTH0_AUDIENCE). */
+  /** Audience the Proxidize API accepts for exchanged tokens (an Auth0 API identifier). */
   apiAudience: string;
   /** Optional scope to request in the exchange. */
   exchangeScope?: string;
@@ -58,6 +58,9 @@ export function createAuth(cfg: AuthConfig, fetchImpl: typeof fetch = fetch) {
   const jwks = createRemoteJWKSet(new URL(".well-known/jwks.json", cfg.issuer));
   const tokenUrl = new URL("oauth/token", cfg.issuer).toString();
   const exchangeCache = new Map<string, { token: string; expiresAt: number }>();
+  // Concurrent first requests from one user share a single exchange instead of
+  // each calling Auth0 (OBO exchanges are rate limited per tenant).
+  const inflight = new Map<string, Promise<string>>();
 
   async function verifyAccessToken(token: string): Promise<VerifiedToken> {
     try {
@@ -95,6 +98,15 @@ export function createAuth(cfg: AuthConfig, fetchImpl: typeof fetch = fetch) {
     const key = hashToken(verified.token);
     const cached = exchangeCache.get(key);
     if (cached && cached.expiresAt > now) return cached.token;
+
+    const pending = inflight.get(key);
+    if (pending) return pending;
+    const p = exchange(verified, key, now).finally(() => inflight.delete(key));
+    inflight.set(key, p);
+    return p;
+  }
+
+  async function exchange(verified: VerifiedToken, key: string, now: number): Promise<string> {
 
     const body = new URLSearchParams({
       grant_type: TOKEN_EXCHANGE_GRANT,
@@ -144,5 +156,5 @@ export function createAuth(cfg: AuthConfig, fetchImpl: typeof fetch = fetch) {
     return data.access_token;
   }
 
-  return { verifyAccessToken, exchangeForApiToken, _exchangeCache: exchangeCache };
+  return { verifyAccessToken, exchangeForApiToken };
 }

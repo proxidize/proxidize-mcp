@@ -271,7 +271,7 @@ Run the test suite with `npm test` (no credentials needed — it boots the serve
 
 ### Hosted (remote) server
 
-`dist/index.js` is the local stdio server above and is what `npx @proxidize/mcp` runs. `dist/http.js` is a separate entry point that serves the same tools over [Streamable HTTP](https://modelcontextprotocol.io/specification/latest/basic/transports) for remote clients such as ChatGPT and Claude, with each user signing in through OAuth instead of pasting an API token. It is meant to run behind a TLS reverse proxy.
+`dist/index.js` is the local stdio server above and is what `npx @proxidize/mcp` runs. `dist/http.js` is a separate entry point that serves the same tools over [Streamable HTTP](https://modelcontextprotocol.io/specification/latest/basic/transports) for remote clients such as ChatGPT and Claude, with each user signing in through OAuth instead of pasting an API token. It is meant to run behind a TLS reverse proxy and needs Node.js 20 or later (the local server still runs on 18).
 
 - `POST /mcp` — stateless MCP endpoint; every request needs `Authorization: Bearer <access token>`.
 - `GET /.well-known/oauth-protected-resource[/mcp]` — protected resource metadata (RFC 9728) naming the authorization server.
@@ -284,7 +284,7 @@ The access token must be issued by `AUTH0_ISSUER` for this server (audience `<MC
 | `MCP_PUBLIC_URL` | Yes | — | Public origin, e.g. `https://mcp.example.com` |
 | `AUTH0_ISSUER` | Yes | — | Issuer URL with trailing slash |
 | `MCP_AUTH0_CLIENT_ID` / `MCP_AUTH0_CLIENT_SECRET` | Yes | — | Client used for the token exchange |
-| `PROXIDIZE_API_AUDIENCE` | Yes | — | Audience of the Proxidize API |
+| `PROXIDIZE_API_AUDIENCE` | Yes | — | Audience the Proxidize API accepts for exchanged tokens |
 | `MCP_AUTH0_EXCHANGE_SCOPE` | No | — | Scope to request in the exchange |
 | `MCP_HOST` / `MCP_PORT` | No | `127.0.0.1` / `8096` | Listen address |
 

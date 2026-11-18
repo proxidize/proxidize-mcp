@@ -194,15 +194,21 @@ export function createHttpApp(cfg: HttpConfig, deps: { fetchImpl?: typeof fetch 
   app.get("/mcp", notAllowed);
   app.delete("/mcp", notAllowed);
 
-  // Last-resort error handler (e.g. malformed JSON body). Express's default
-  // handler would print a stack trace unless NODE_ENV=production.
+  // Last-resort error handler (malformed or oversized body, ...). Express's
+  // default handler would print a stack trace unless NODE_ENV=production.
+  // Client errors keep their status with a generic message; anything else is
+  // logged and becomes a 500.
   app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
-    const status = (err as { status?: number })?.status;
-    if (status !== 400) logger.error("unhandled error", { error: String(err) });
+    const raw = Number((err as { status?: number })?.status);
+    const clientError = raw >= 400 && raw < 500;
+    if (!clientError) logger.error("unhandled error", { error: String(err) });
     if (res.headersSent) return;
-    res.status(status === 400 ? 400 : 500).json({
+    res.status(clientError ? raw : 500).json({
       jsonrpc: "2.0",
-      error: { code: status === 400 ? -32700 : -32603, message: status === 400 ? "Parse error" : "Internal server error" },
+      error: {
+        code: raw === 400 ? -32700 : clientError ? -32600 : -32603,
+        message: raw === 400 ? "Parse error" : clientError ? "Invalid request" : "Internal server error",
+      },
       id: null,
     });
   });
