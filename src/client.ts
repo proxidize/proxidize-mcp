@@ -1,13 +1,13 @@
 import axios, { type AxiosError } from "axios";
 import * as rax from "retry-axios";
 import { config } from "./config.js";
+import { currentToken, getMode } from "./context.js";
 import { logger } from "./logger.js";
 
 const http = axios.create({
   baseURL: config.baseUrl,
   timeout: config.timeout,
   headers: {
-    Authorization: `Bearer ${config.token}`,
     "Content-Type": "application/json",
     "User-Agent": "@proxidize/mcp/0.1.0",
   },
@@ -28,6 +28,13 @@ const http = axios.create({
 });
 
 rax.attach(http);
+
+// The token is resolved per request (not baked into the client) so the hosted
+// server can serve many users from one process: see context.ts.
+http.interceptors.request.use((req) => {
+  req.headers.set("Authorization", `Bearer ${currentToken()}`);
+  return req;
+});
 
 const MAX_ERROR_MESSAGE_LENGTH = 500;
 
@@ -61,12 +68,16 @@ function formatError(err: unknown): Error {
 
   const authHint =
     status === 401 || status === 403
-      ? ". Your PROXIDIZE_API_TOKEN was rejected. To fix it: " +
-        '1) go to https://www.app.proxidize.com/settings/ and click "API Token"; ' +
-        '2) copy the token and set it as PROXIDIZE_API_TOKEN in your MCP config (the "Bearer " prefix is optional); ' +
-        "3) restart your MCP client. " +
-        "If it still fails, make sure your account has an active Proxidize subscription. " +
-        "Setup guide: https://help.proxidize.com/tools/proxidize-mcp-server"
+      ? getMode() === "http"
+        ? ". Your Proxidize sign-in was rejected or has expired. To fix it, reconnect your " +
+          "Proxidize account in your AI app. If it still fails, make sure your account has an " +
+          "active Proxidize subscription."
+        : ". Your PROXIDIZE_API_TOKEN was rejected. To fix it: " +
+          '1) go to https://www.app.proxidize.com/settings/ and click "API Token"; ' +
+          '2) copy the token and set it as PROXIDIZE_API_TOKEN in your MCP config (the "Bearer " prefix is optional); ' +
+          "3) restart your MCP client. " +
+          "If it still fails, make sure your account has an active Proxidize subscription. " +
+          "Setup guide: https://help.proxidize.com/tools/proxidize-mcp-server"
       : "";
 
   return new Error(`HTTP ${status}: ${msg}${authHint}`);

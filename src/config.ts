@@ -1,17 +1,3 @@
-const rawToken = process.env.PROXIDIZE_API_TOKEN;
-if (!rawToken) {
-  throw new Error(
-    "PROXIDIZE_API_TOKEN is required. Get yours from the Proxidize dashboard: Settings > API Token"
-  );
-}
-
-const token = rawToken.trim().replace(/^bearer\s+/i, "");
-if (/\s/.test(token)) {
-  throw new Error(
-    "PROXIDIZE_API_TOKEN contains whitespace or a newline — check for stray quotes or formatting issues when it was copied into your MCP config."
-  );
-}
-
 const DEFAULT_BASE_URL = "https://api.proxidize.com/api/v1";
 const LOOPBACK_HOSTNAMES = new Set(["localhost", "127.0.0.1", "::1"]);
 
@@ -42,7 +28,6 @@ function resolveBaseUrl(): string {
 }
 
 export const config = {
-  token,
   baseUrl: resolveBaseUrl(),
   proxyHost: process.env.PROXIDIZE_PROXY_HOST || "pg.proxi.es",
   timeout: parseInt(process.env.PROXIDIZE_TIMEOUT || "30000", 10),
