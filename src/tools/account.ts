@@ -1,4 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import axios from "axios";
 import { get } from "../client.js";
 import { ok } from "../result.js";
@@ -34,6 +35,23 @@ async function getAllSubscriptions(): Promise<Paginated<Subscription>> {
   return { perPage: data.length, page: 1, total: data.length, data };
 }
 
+// With no active plan the server hides every plan tool, so an empty list is all
+// the model sees. Add a plain note so it can tell the user why, instead of
+// guessing. The structured result is unchanged.
+export const NO_PLAN_NOTE =
+  "No active Proxidize plan was found for the account this server is signed in as, so the proxy " +
+  "tools are not available. Tell the user: if they expected plans, they may be signed in with a " +
+  "different Proxidize account (disconnect and sign in again, or use that account's API key); " +
+  "otherwise a plan can be bought at https://proxidize.com.";
+
+function subscriptionsResult(data: Paginated<Subscription>, scope: string): CallToolResult {
+  const result = ok(data);
+  if (data.data.length === 0) {
+    result.content.push({ type: "text", text: scope === "all" ? NO_PLAN_NOTE : `No active ${scope} plan was found for this account.` });
+  }
+  return result;
+}
+
 export function registerAccountTools(
   server: McpServer,
   options: { outboundIp?: boolean } = {}
@@ -55,7 +73,7 @@ export function registerAccountTools(
     },
     async ({ type }) => {
       if (!type) {
-        return ok(await getAllSubscriptions());
+        return subscriptionsResult(await getAllSubscriptions(), "all");
       }
 
       const data = filterSubscriptionResponse(
@@ -64,7 +82,7 @@ export function registerAccountTools(
         }),
         type
       );
-      return ok(data);
+      return subscriptionsResult(data, type);
     }
   );
 
