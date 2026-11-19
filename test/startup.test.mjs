@@ -124,3 +124,39 @@ test("discovers tools via legacy wire filters with canonical responses", async (
     );
   }
 });
+
+test("get_subscription explains an empty result instead of returning a bare empty list", async () => {
+  const { startFakeApi } = await import("./helpers.mjs");
+  const api = await startFakeApi({ plansFor: () => ({}) });
+  const transport = new StdioClientTransport({
+    command: "node",
+    args: ["dist/index.js"],
+    env: {
+      ...process.env,
+      PROXIDIZE_API_TOKEN: "test-token",
+      PROXIDIZE_BASE_URL: api.url,
+      PROXIDIZE_MAX_RETRIES: "0",
+      PROXIDIZE_DISABLE_ANALYTICS: "1",
+    },
+  });
+  const client = new Client({ name: "no-plan-test", version: "1.0.0" });
+  try {
+    await client.connect(transport);
+    const all = await client.callTool({ name: "get_subscription", arguments: {} });
+    assert.equal(all.isError, undefined);
+    assert.equal(all.structuredContent.total, 0);
+    assert.deepEqual(all.structuredContent.data, []);
+    assert.equal(all.content.length, 2);
+    assert.match(all.content[1].text, /No active Proxidize plan was found for this PROXIDIZE_API_TOKEN/);
+    assert.match(all.content[1].text, /app\.proxidize\.com\/settings/);
+    assert.match(all.content[1].text, /restart your MCP client/i);
+
+    const one = await client.callTool({ name: "get_subscription", arguments: { type: "per_gb_mobile" } });
+    assert.equal(one.content.length, 2);
+    assert.match(one.content[1].text, /No active per_gb_mobile plan/);
+    assert.match(one.content[1].text, /without a type/);
+  } finally {
+    await client.close();
+    await api.close();
+  }
+});
