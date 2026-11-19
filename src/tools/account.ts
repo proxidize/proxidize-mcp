@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import axios from "axios";
 import { get } from "../client.js";
+import { getMode } from "../context.js";
 import { ok } from "../result.js";
 import { outputSchemas } from "../schemas.js";
 import type { Paginated, Subscription } from "../schemas.js";
@@ -35,19 +36,28 @@ async function getAllSubscriptions(): Promise<Paginated<Subscription>> {
   return { perPage: data.length, page: 1, total: data.length, data };
 }
 
-// With no active plan the server hides every plan tool, so an empty list is all
-// the model sees. Add a plain note so it can tell the user why, instead of
-// guessing. The structured result is unchanged.
-export const NO_PLAN_NOTE =
-  "No active Proxidize plan was found for the account this server is signed in as, so the proxy " +
-  "tools are not available. Tell the user: if they expected plans, they may be signed in with a " +
-  "different Proxidize account (disconnect and sign in again, or use that account's API key); " +
-  "otherwise a plan can be bought at https://proxidize.com.";
+const GET_A_PLAN = "If you don't have a plan yet, you can get one at https://proxidize.com.";
+
+export function noPlanNote(): string {
+  return getMode() === "http"
+    ? "No active Proxidize plan was found for the account you're signed in with, so no proxy tools are available. " +
+        "If you expected plans, you may have signed in with a different Proxidize account: disconnect Proxidize in your AI app and reconnect with the right one. " +
+        `${GET_A_PLAN} Reconnect after buying so the tools appear.`
+    : "No active Proxidize plan was found for this PROXIDIZE_API_TOKEN, so no proxy tools are available. " +
+        'If you expected plans, the token may belong to a different account: copy the right one from https://www.app.proxidize.com/settings/ ("API Token"), update your MCP config and restart your MCP client. ' +
+        `${GET_A_PLAN} Restart your MCP client after buying so the tools appear.`;
+}
 
 function subscriptionsResult(data: Paginated<Subscription>, scope: string): CallToolResult {
   const result = ok(data);
   if (data.data.length === 0) {
-    result.content.push({ type: "text", text: scope === "all" ? NO_PLAN_NOTE : `No active ${scope} plan was found for this account.` });
+    result.content.push({
+      type: "text",
+      text:
+        scope === "all"
+          ? noPlanNote()
+          : `No active ${scope} plan was found for this account. Call get_subscription without a type to see every plan on the account.`,
+    });
   }
   return result;
 }

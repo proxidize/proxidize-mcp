@@ -147,11 +147,14 @@ test("get_subscription explains an empty result instead of returning a bare empt
     assert.equal(all.structuredContent.total, 0);
     assert.deepEqual(all.structuredContent.data, []);
     assert.equal(all.content.length, 2);
-    assert.match(all.content[1].text, /No active Proxidize plan/);
+    assert.match(all.content[1].text, /No active Proxidize plan was found for this PROXIDIZE_API_TOKEN/);
+    assert.match(all.content[1].text, /app\.proxidize\.com\/settings/);
+    assert.match(all.content[1].text, /restart your MCP client/i);
 
     const one = await client.callTool({ name: "get_subscription", arguments: { type: "per_gb_mobile" } });
     assert.equal(one.content.length, 2);
     assert.match(one.content[1].text, /No active per_gb_mobile plan/);
+    assert.match(one.content[1].text, /without a type/);
   } finally {
     await client.close();
     await api.close();
